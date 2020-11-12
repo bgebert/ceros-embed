@@ -1,0 +1,699 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        
+        <!--
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        -->
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" ohref="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" ohref="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script osrc="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+        
+        <script>
+            /*
+            $(function() {
+                //alert( "the document is ready!" );
+            });
+            */
+
+            var SHRM = SHRM || {};
+            SHRM.utils = {};
+
+            (function () {
+                this.getRemoteData = function (path_to_csv){
+                    if (this.ajaxResults[path_to_csv]){
+                        return this.ajaxResults[path_to_csv]
+                    }else{
+                        var ajax = $.get(path_to_csv,function(response){
+                            //do nothing
+                        });
+                        console.log('Fetching new data: ' + path_to_csv)
+                        this.ajaxResults[path_to_csv] = ajax
+                        return ajax;
+                    }
+                };
+
+                this.convertCSVtoJSON = function (csv, arrKeys) {
+                    let vals = csv.split('\n'), ret = [];
+                    
+                    for( let i = 1, len = vals.length; i < len; i++ ){
+                        if (vals[i].length > 0){
+                            let option = vals[i].split(';');
+                            if (i == 1){
+                                ret.push('{')
+                            }else{
+                                ret.push(',{')
+                            }
+                            
+                            $.each(arrKeys, function( index, value ) {
+                                params=option[index].split('=');
+                                if (params.length == 2) {
+                                    ret.push( '"' + value + '_keyval": "' + option[index].replace(/(\r\n|\n|\r)/gm,"") + '", "' + value + '": "' + params[1].replace(/(\r\n|\n|\r)/gm,"") + '"');
+                                }else{
+                                    ret.push( '"' + value + '_keyval": "' + option[index].replace(/(\r\n|\n|\r)/gm,"") + '", "' + value + '": "' + params[0].replace(/(\r\n|\n|\r)/gm,"") + '"');
+                                }
+                                //ret.push( '"' + value + '": "' + option[index].replace(/(\r\n|\n|\r)/gm,"") + '"');
+                                if (arrKeys.length - 1 != index){ ret.push(','); }
+                            });
+                            ret.push('}')
+                        }
+                    }
+                    //console.log(JSON.parse('[' + ret.join("") + ']'));
+                    return JSON.parse('[' + ret.join("") + ']');
+                };
+
+                this.getDistinctVals = function (dataObj, key){
+                    var lookup = {};
+                    var result = [];
+
+                    for (var item, i = 0; item = dataObj[i++];) {
+                        var value = eval('item.' + key);
+
+                        if (!(value in lookup)) {
+                            lookup[value] = 1;
+                            result.push(value);
+                        }
+                    }
+
+                    return result
+                };
+
+                this.configureDropDowns = function (dataObj, key, selectObj, optgroup_label) {
+                    result = this.getDistinctVals(dataObj, key)
+                    //debugger
+                    var $optgroup = selectObj
+                    if (optgroup_label){
+                        $optgroup = $("<optgroup label='" + optgroup_label + "'>"); 
+                    }
+                    $.each(result, function (index, value) {
+                        params=value.split('=');
+                        if (params.length == 2) {
+                            $optgroup.append(new Option(params[0], params[1]))
+                        }else{
+                            $optgroup.append(new Option(value, value))
+                        }
+                    });
+                    if (optgroup_label){
+                        selectObj.append($optgroup)
+                    }
+
+                    selectObj.prop('data-val', dataObj);
+                    $('.selectpicker').selectpicker('refresh');
+                };
+
+                this.disableOptions = function (arrOptions, objSelect){
+                    var $options = objSelect.find('option');
+                    $options.prop('disabled', false);
+                    
+                    if (arrOptions.length == 0) {
+                        objSelect.val('')
+                    } else {
+                        $options.each(function () {
+                            if (( $(this).val() == '' ) || ( $.inArray($(this).val(), arrOptions) >= 0 )){
+                                $(this).prop('disabled', false)
+                            }else{
+                                $(this).prop('disabled', true)
+                            }
+                        });
+                        if(objSelect.find('option:selected').prop('disabled')){
+                            objSelect.val('');
+                        }
+                    }
+                    objSelect.trigger('change');
+
+                    if (objSelect.closest('.tab-pane').find('select')[2]){
+                        //console.log('Selected: ' + objSelect.closest('.tab-pane').find('select')[0].value + ' -- ' + objSelect.closest('.tab-pane').find('select')[1].value + ' -- ' + objSelect.closest('.tab-pane').find('select')[2].value);
+                    }
+                    
+                };
+
+                this.filterJSON = function (dataObj, criteria){
+                    return dataObj.filter(o => Object.keys(criteria).every(k => criteria[k].some(f => o[k] === f)));
+                };
+                
+                this.urlParam = function(key){
+                    var params = new RegExp('[\?&]' + key + '=([^&#]*)').exec(window.location.href);
+                    if (params==null) {
+                        return null;
+                    }
+                    return decodeURI(params[1]);
+                };
+
+                this.resetDrillDownSiblings = function(classname, oSelects){
+                    $.each(oSelects, function( index, value ) {
+                        //change it to read class vs index
+                        if (!($( oSelects[index] ).hasClass(classname))) {
+                            $( oSelects[index] ).val('');
+                            $( oSelects[index] ).selectpicker('refresh');
+                        }
+                    });
+                };
+
+                this.filterDrillDownSiblings = function(ndx, filterBy, objContainter, arrConfigKeys){
+                    var dataObj = objContainter.find('select:nth(' + ndx + ')').prop('data-val');
+                    var filteredObj = this.filterJSON(dataObj, filterBy)
+                    var arrOptions = this.getDistinctVals(filteredObj, arrConfigKeys[ndx + 1])
+                    this.disableOptions(arrOptions, objContainter.find('select:nth(' + (ndx+1) + ')'));
+                    $('.selectpicker').selectpicker('refresh');
+                };
+
+                this.ajaxResults = {};
+
+                this.globalConfigKeys = [];
+
+                this.capitalize = function(s){
+                    if (typeof s !== 'string') return ''
+                    return s.charAt(0).toUpperCase() + s.slice(1)
+                };
+
+            }).apply(SHRM.utils);
+
+            function initDrillDown(objContainter){
+                if (objContainter.attr('loaded') === undefined){
+                    var arrConfigKeys = SHRM.utils.globalConfigKeys;
+
+                    if (objContainter.attr('data-val-config-keys')){
+                        arrConfigKeys = eval(objContainter.attr('data-val-config-keys'));
+                    }
+
+                    if ((objContainter) && (arrConfigKeys.length == 3)){
+                        if (objContainter.attr('data-val-config-path') == null){
+                            alert('The path to the config has not been configured for ' + objContainter.attr('id'));
+                        }else{
+                            $.when(SHRM.utils.getRemoteData(objContainter.attr('data-val-config-path'))).done(function(response,status,xhrObj){
+                                var dataObj = SHRM.utils.convertCSVtoJSON(response, arrConfigKeys)
+                                
+                                if (objContainter.attr('data-val-filterby') == 'by-1'){
+                                    SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', objContainter.find('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[0]))
+                                    SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', objContainter.find('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[1]))
+                                    SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[2] + '_keyval', objContainter.find('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[2]))
+                                }else{
+                                    SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', objContainter.find('.selectpicker-1'))
+                                    SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', objContainter.find('.selectpicker-2'))
+                                    SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[2] + '_keyval', objContainter.find('.selectpicker-3'))
+                                }
+
+                            }).fail(function(response,status,xhrObj){
+                                console.error(response)
+                                console.error('The required config was not found at ' + objContainter.attr('data-val-config-path'))
+                            });
+                        }
+                    }
+                    objContainter.attr('loaded', 'true')
+                }
+            };
+
+            $(document).ready(function() {
+                console.time('Page load')
+                SHRM.utils.globalConfigKeys = ['region','industry','orgsize']
+
+                $('iframe').on('load', function (event){
+                    var iframes = $( event.target ).closest('.tab-pane').find('iframe')
+                    var changeDecrease = false;
+
+                    for( var i = 0; i < iframes.length; i++) {
+                        if ($(iframes[i])[0].contentDocument.title.indexOf("404") >= 0){
+                            console.log("404 Error: Couldn't locate " + $(iframes[i])[0].src)
+                            $(iframes[i])[0].src = 'about:blank'
+                        }
+                        
+                        //Find all NA in the iframe and replace it with --
+                        //This is being done b/c we didn't know how to remove it within RStudio
+                        var iframeDoc = $(iframes[i])[0].contentWindow.document;
+                        var vals = $(iframeDoc).find("body").find('td:contains(" NA ")')
+                        for( let i = 0, len = vals.length; i < len; i++ ){
+                            $(vals[i]).text(' -- ');
+                        }
+
+                        //Find all cells without an up/down/flat indicator and add it
+                        //This is being done b/c we didn't know how to add it within RStudio
+                        var vals = $(iframeDoc).find("body").find('.glyphicon-')
+                        for( let i = 0, len = vals.length; i < len; i++ ){
+                            amtChange = $(vals[i]).closest('td').prev('td').text();
+                            classIndicator = 'glyphicon-arrow-up';
+                            $(vals[i]).parent().css('color','silver');
+                            if (amtChange.indexOf(' 0%') >= 0){
+                                classIndicator = 'glyphicon-minus'
+                            }else{
+                                if (amtChange.indexOf('-') >= 0) { classIndicator = 'glyphicon-arrow-down' }
+                            }
+                            $(vals[i]).addClass(classIndicator).removeClass('.glyphicon-')
+                        }
+                        
+                        if ((iframes[i]) && (iframes[i].contentWindow) && (iframes[i].contentWindow.document) && (iframes[i].contentWindow.document.body)){
+                            //iframes[i].width  = '100%';
+                            iframes[i].height = iframes[i].contentWindow.document.body.scrollHeight + 'px';
+                        }
+                    }
+                });
+
+                $( window ).on('resize', function(event) {
+                    //var iframes = $('iframe')
+                    var iframes = $('.drilldown').find('.responsive_iframe')
+                    
+                    for( var i = 0; i < iframes.length; i++) {
+                        if ((iframes[i]) && (iframes[i].contentWindow) && (iframes[i].contentWindow.document) && (iframes[i].contentWindow.document.body)){
+                            if ((iframes[i].src == '') || (iframes[i].src == 'about:blank')){
+                                //iframes[i].width  = '100%';
+                                iframes[i].height = '0px';
+                            }else{
+                                //iframes[i].width  = '100%';
+                                iframes[i].height = iframes[i].contentWindow.document.body.scrollHeight + 'px';
+                            }
+                        }
+                    }
+                    //console.log('on resize');
+                } );
+
+                $('.btn').on('click', function (event){
+                    var src = $(event.target).closest('.tab-pane').attr('data-val-file-prefix') + '-'
+                    
+                    if ($( event.target ).closest('.tab-pane').attr('data-val-filterby') == 'by-1'){
+                        //The following code block is here to build the URL Path to match the HTML naming convention ONLY.
+                        var arrConfigKeys = SHRM.utils.globalConfigKeys;
+                        var optGroup = $( event.target ).closest('.tab-pane').find('.selectpicker-1').find('option:selected').closest('optgroup').attr('label')
+                        if ($( event.target ).closest('.tab-pane').attr('data-val-config-keys')){
+                            arrConfigKeys = eval($( event.target ).closest('.tab-pane').attr('data-val-config-keys'));
+                        }
+
+                        $.each(arrConfigKeys, function( index, value ) {
+                            if ((optGroup) && (optGroup.toLowerCase() == value)){
+                                src += $(event.target).closest('.tab-pane').find('.selectpicker-1').val();
+                            }else{
+                                src += '-'
+                            }
+                        });
+
+                        src += '.html'
+                    }else{
+                        src = src + $(event.target).closest('.tab-pane').find('.selectpicker-1').val() + '-' + $(event.target).closest('.tab-pane').find('.selectpicker-2').val() + '-' + $(event.target).closest('.tab-pane').find('.selectpicker-3').val() + '.html'
+                    }
+                    
+                    $(event.target).closest('.tab-pane').find('.responsive_iframe').attr('src', src.toLowerCase())
+                    
+                    console.log('on click: ' + src);
+                });
+
+                $(document).on('shown.bs.tab', function (event) {
+                    var arrHREF = $(event.target).prop('href').split('#')
+                    var url = ''
+                    if (arrHREF.length == 2){
+                        url = arrHREF[1]
+                        var obj = $('#' + url)
+                    }
+
+                    if ((obj) && (obj.is(':visible'))){
+                        //if ($( window ).attr('loaded')){
+                            obj.find('.btn').trigger('click')
+                            obj.find('.btn').focus()
+                            console.log('shown.bs.tab: ' + obj.is(':visible'))
+                        //}
+                    }
+                });
+
+                $(document).on('show.bs.tab', function (event) {
+                    id = $( event.target ).attr('href')
+                    initDrillDown($(id));
+                });
+                
+                $('.selectpicker-1').on('change', function (event) {
+                    var objContainter = $( event.target ).closest('.tab-pane');
+                    var arrConfigKeys = SHRM.utils.globalConfigKeys;
+                    
+                    if (objContainter.attr('data-val-config-keys')){
+                        arrConfigKeys = eval(objContainter.attr('data-val-config-keys'));
+                    }
+
+                    if (objContainter.attr('data-val-filterby') == 'by-all'){
+                        var ndx = 0;
+                        var filterBy = { [arrConfigKeys[ndx]]: [objContainter.find('.selectpicker-1').val()] }  //filterBy = { KEY1: ["VALUE1", "VALUE2"], KEY2: ["VALUE3", "VALUE4"] }
+                        SHRM.utils.filterDrillDownSiblings(ndx, filterBy, objContainter, arrConfigKeys);
+                    }else{
+                        if (objContainter.attr('data-val-filterby') == 'by-3'){
+                            SHRM.utils.resetDrillDownSiblings('selectpicker-1', objContainter.find('select'));
+                        };
+                    }
+                });
+
+                $('.selectpicker-2').on('change', function (event) {
+                    var objContainter = $( event.target ).closest('.tab-pane');
+                    var arrConfigKeys = SHRM.utils.globalConfigKeys;
+
+                    if (objContainter.attr('data-val-config-keys')){
+                        arrConfigKeys = eval(objContainter.attr('data-val-config-keys'));
+                    }
+                    
+                    if (objContainter.attr('data-val-filterby') == 'by-all'){
+                        var ndx = 1
+                        var filterBy = { [arrConfigKeys[ndx-1]]: [objContainter.find('.selectpicker-1').val()], [arrConfigKeys[ndx]]: [objContainter.find('.selectpicker-2').val()] } //filterBy = { KEY1: ["VALUE1", "VALUE2"], KEY2: ["VALUE3", "VALUE4"] }
+                        SHRM.utils.filterDrillDownSiblings(ndx, filterBy, objContainter, arrConfigKeys);
+                    }else{
+                        if (objContainter.attr('data-val-filterby') == 'by-3'){
+                            SHRM.utils.resetDrillDownSiblings('selectpicker-2', objContainter.find('select'));
+                        };
+                    }
+                });
+
+                $('.selectpicker-3').on('change', function (event) {
+                    var objContainter = $( event.target ).closest('.tab-pane');
+                    
+                    if (objContainter.attr('data-val-filterby') == 'by-all'){
+                        //console.log('Selected: ' + objContainter.find('select:nth(0)').find('option:selected').val() + ' -- ' + objContainter.find('select:nth(1)').find('option:selected').val() + ' -- ' + objContainter.find('select:nth(2)').find('option:selected').val());
+                    }else{
+                        if (objContainter.attr('data-val-filterby') == 'by-3'){
+                            SHRM.utils.resetDrillDownSiblings('selectpicker-3', objContainter.find('select'));
+                        };
+                    }
+                });
+                
+                $('.navpicker').on('change', function(event){
+                    $('#' + $( event.target ).val()).trigger('click')
+                });
+
+                initDrillDown($('#health-tab1'));
+
+                initDrillDown($('#insurance-tab1'));
+                
+                console.timeEnd('Page load') 
+            });
+        </script>
+
+        <style>
+            div.drilldown {
+                background-color:white;
+                margin-left: 20px;
+            }
+
+            div.opage1 {
+                background-image: url("./images/page1.jpg");
+                background-repeat: no-repeat;
+                background-color: #cccccc;
+                height: 1648px;
+            }
+
+            div.opage2 {
+                background-image: url("./images/page2.jpg");
+                background-repeat: no-repeat;
+                background-color: #cccccc;
+                height: 1648px;
+            }
+
+            div.opage3 {
+                background-image: url("./images/page3.jpg");
+                background-repeat: no-repeat;
+                background-color: #cccccc;
+                height: 800px;
+            }
+            
+            div.opage4 {
+                background-image: url("./images/page4.jpg");
+                background-repeat: no-repeat;
+                background-color: #cccccc;
+                height: 1648px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            div.responsive_container {
+                position: absolute;
+                overflow: hidden;
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            a.nav-link {color: #333333;}
+            .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {color: #000000;}
+
+            @media screen and (max-width: 1200px) {
+                .nav_layer1{ display: contents; }
+                .nav_layer2{ display: none; }
+            }
+
+            @media screen and (min-width: 1200px) {
+                .nav_layer1{ display: none; }
+                .nav_layer2{ display: block; }
+            }
+
+            iframe.responsive_iframe {
+                position: relative;
+                width: 100%;
+                min-width: 600px;
+                min-height: 200px;
+            }
+            
+            .bootstrap-select>.dropdown-toggle.bs-placeholder, .bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover {
+                ocolor: #000;
+            }
+        </style>
+
+    </head>
+
+    <body ostyle="max-width:1275px">
+        <div class="page1 hidden">&nbsp;</div>
+        <div class="page2 hidden">&nbsp;</div>
+        <div class="page3 hidden">&nbsp;</div>
+        <div class="drilldown" id="drilldown_benefits_health">
+            <div class="nav_layer2">
+                <ul class="nav nav-tabs" id="tabs_Health" role="tablist" ostyle="display: none;">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="health-one-tab" data-toggle="tab" href="#health-tab1" role="tab" aria-controls="home" aria-selected="true">General Health</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-two-tab" data-toggle="tab" href="#health-tab2" role="tab" aria-controls="home" aria-selected="true">HSA & FSA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-three-tab" data-toggle="tab" href="#health-tab3" role="tab" aria-controls="home" aria-selected="true">Prescription Drug</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-four-tab" data-toggle="tab" href="#health-tab4" role="tab" aria-controls="home" aria-selected="true">Supplemental Health Ins.</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-five-tab" data-toggle="tab" href="#health-tab5" role="tab" aria-controls="home" aria-selected="true">Disability & Accident Ins.</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-six-tab" data-toggle="tab" href="#health-tab6" role="tab" aria-controls="home" aria-selected="true">Coverage for Specific Health Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-seven-tab" data-toggle="tab" href="#health-tab7" role="tab" aria-controls="profile" aria-selected="false">Example B</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="health-eight-tab" data-toggle="tab" href="#health-tab8" role="tab" aria-controls="contact" aria-selected="false">Example C</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content" id="tabs_Content_Health">
+                <div class="nav_layer1">
+                    <select class="col-md-4 selectpicker navpicker" data-size="9">
+                        <option value="health-one-tab">General Health</option>
+                        <option value="health-two-tab">HSA & FSA</option>
+                        <option value="health-three-tab">Prescription Drug</option>
+                        <option value="health-four-tab">Supplemental Health Ins.</option>
+                        <option value="health-five-tab">Disability & Accident Ins.</option>
+                        <option value="health-six-tab">Coverage for Specific Health Services</option>
+                        <option value="health-seven-tab">Example B</option>
+                        <option value="health-eight-tab">Example C</option>
+                    </select>
+                </div>
+                <div class="tab-pane fade show active" id="health-tab1" role="tabpanel" aria-labelledby="health-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/genhealth/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="<>" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <!--
+                        <span class="ors"> OR </span>
+                        <select required="required" class="col-md-2 selectpicker selectpicker-2" data-size="6">
+                            <option value="" data-val="all">All Industries</option>
+                        </select>
+                        <span class="ors"> OR </span>
+                        <select required="required" class="col-md-2 selectpicker selectpicker-3" data-size="6">
+                            <option value="" data-val="all">All Orgs</option>
+                        </select>
+                        -->
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="./data/genhealth/genhealth----.html" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab2" role="tabpanel" aria-labelledby="health-tab2" data-val-filterby="by-1" data-val-file-prefix='./data/HealthSavings/HealthSavings' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab3" role="tabpanel" aria-labelledby="health-tab3" data-val-filterby="by-1" data-val-file-prefix='./data/PrescriptionDrugs/PrescriptionDrugs' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab4" role="tabpanel" aria-labelledby="health-tab4" data-val-filterby="by-1" data-val-file-prefix='./data/Dental_Vision/Dental_Vision' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab5" role="tabpanel" aria-labelledby="health-tab5" data-val-filterby="by-1" data-val-file-prefix='./data/DisabilityAccident/DisabilityAccident' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab6" role="tabpanel" aria-labelledby="health-tab6" data-val-filterby="by-1" data-val-file-prefix='./data/Specific_Services/Specific_Services' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab7" role="tabpanel" aria-labelledby="health-tab7" data-val-filterby="by-3" data-val-file-prefix='./data/genhealth/GenHealth' data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-2 selectpicker selectpicker-1" data-size="6">
+                            <option value="" data-val="all">All Regions</option>
+                        </select>
+                        <span class="ors"> OR </span>
+                        <select required="required" class="col-md-2 selectpicker selectpicker-2" data-size="6">
+                            <option value="" data-val="all">All Industries</option>
+                        </select>
+                        <span class="ors"> OR </span>
+                        <select required="required" class="col-md-2 selectpicker selectpicker-3" data-size="6">
+                            <option value="" data-val="all">All Orgs</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="health-tab8" role="tabpanel" aria-labelledby="health-tab8" data-val-filterby="by-all" data-val-file-prefix='./data/genhealth/GenHealth' data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-2 selectpicker selectpicker-1" data-size="6">
+                            <option value="" data-val="all">All Regions</option>
+                        </select>
+                        <span class="ors"> OR </span>
+                        <select required="required" class="col-md-2 selectpicker selectpicker-2" data-size="6">
+                            <option value="" data-val="all">All Industries</option>
+                        </select>
+                        <span class="ors"> OR </span>
+                        <select required="required" class="col-md-2 selectpicker selectpicker-3" data-size="6">
+                            <option value="" data-val="all">All Orgs</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page4 hidden">&nbsp;</div>
+        <div class="drilldown hidden" id="drilldown_benefits_insurance">
+            <ul class="nav nav-tabs" id="tabs_Insurance" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="health-one-tab" data-toggle="tab" href="#insurance-tab1" role="tab" aria-controls="home" aria-selected="true">Insurance Tab 1</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="insurance-two-tab" data-toggle="tab" href="#insurance-tab2" role="tab" aria-controls="profile" aria-selected="false">Insurance Tab 2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="insurance-three-tab" data-toggle="tab" href="#insurance-tab3" role="tab" aria-controls="contact" aria-selected="false">Insurance Tab 3</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="tabs_Content_Insurance">
+                <div class="tab-pane fade show active" id="insurance-tab1" role="tabpanel" aria-labelledby="insurance-tab1" data-val-file-prefix='./data/insurance-tab1' data-val-filterby="by-all" data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="./data/insurance-tab1---.html" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="insurance-tab2" role="tabpanel" aria-labelledby="insurance-tab2" data-val-file-prefix='./data/insurance-tab2' data-val-filterby="by-all"  data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="insurance-tab3" role="tabpanel" aria-labelledby="insurance-tab3" data-val-file-prefix='./data/insurance-tab3' data-val-filterby="by-1"  data-val-config-path="./data/config.csv">
+                    <div>
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                        </select>
+                        <div class="col-md-2" style="display:inline-block">
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                        </div>
+                    </div>
+                    <div>
+                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
