@@ -235,6 +235,7 @@
                         for( let i = 0, len = vals.length; i < len; i++ ){
                             $(vals[i]).text(' -- ');
                         }
+                        $(iframeDoc).find("body").css("padding", "20px 10px 0px 10px")
 
                         //Find all cells without an up/down/flat indicator and add it
                         //This is being done b/c we didn't know how to add it within RStudio
@@ -252,7 +253,6 @@
                         }
                         
                         if ((iframes[i]) && (iframes[i].contentWindow) && (iframes[i].contentWindow.document) && (iframes[i].contentWindow.document.body)){
-                            //iframes[i].width  = '100%';
                             iframes[i].height = iframes[i].contentWindow.document.body.scrollHeight + 'px';
                         }
                     }
@@ -383,45 +383,44 @@
                 });
 
                 initDrillDown($('#health-tab1'));
-
-                initDrillDown($('#insurance-tab1'));
                 
                 console.timeEnd('Page load') 
             });
         </script>
-
+<!--
+        <script type="text/javascript">
+            function sendHeight()
+            {
+                debugger
+                if(parent.postMessage)
+                {
+                    // replace #wrapper with element that contains 
+                    // actual page content
+                    var height= document.getElementById('wrapper').offsetHeight;
+                    parent.postMessage(height, '*');
+                }
+            }
+            
+            // Create browser compatible event handler.
+            var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+            var eventer = window[eventMethod];
+            var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+            
+            // Listen for a message from the iframe.
+            eventer(messageEvent, function(e) {
+                debugger
+                if (isNaN(e.data)) return;
+            
+                sendHeight();
+            
+            }, 
+            false);
+        </script>
+-->
         <style>
             div.drilldown {
                 background-color:white;
                 margin-left: 20px;
-            }
-
-            div.opage1 {
-                background-image: url("./images/page1.jpg");
-                background-repeat: no-repeat;
-                background-color: #cccccc;
-                height: 1648px;
-            }
-
-            div.opage2 {
-                background-image: url("./images/page2.jpg");
-                background-repeat: no-repeat;
-                background-color: #cccccc;
-                height: 1648px;
-            }
-
-            div.opage3 {
-                background-image: url("./images/page3.jpg");
-                background-repeat: no-repeat;
-                background-color: #cccccc;
-                height: 800px;
-            }
-            
-            div.opage4 {
-                background-image: url("./images/page4.jpg");
-                background-repeat: no-repeat;
-                background-color: #cccccc;
-                height: 1648px;
             }
 
             .hidden {
@@ -464,9 +463,6 @@
     </head>
 
     <body ostyle="max-width:1275px">
-        <div class="page1 hidden">&nbsp;</div>
-        <div class="page2 hidden">&nbsp;</div>
-        <div class="page3 hidden">&nbsp;</div>
         <div class="drilldown" id="drilldown_benefits_health">
             <div class="nav_layer2">
                 <ul class="nav nav-tabs" id="tabs_Health" role="tablist" ostyle="display: none;">
@@ -525,7 +521,7 @@
                         </select>
                         -->
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -538,7 +534,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -551,7 +547,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -564,7 +560,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -577,7 +573,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -590,7 +586,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -611,7 +607,7 @@
                             <option value="" data-val="all">All Orgs</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
@@ -632,62 +628,7 @@
                             <option value="" data-val="all">All Orgs</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
-                        </div>
-                    </div>
-                    <div>
-                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="page4 hidden">&nbsp;</div>
-        <div class="drilldown hidden" id="drilldown_benefits_insurance">
-            <ul class="nav nav-tabs" id="tabs_Insurance" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="health-one-tab" data-toggle="tab" href="#insurance-tab1" role="tab" aria-controls="home" aria-selected="true">Insurance Tab 1</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="insurance-two-tab" data-toggle="tab" href="#insurance-tab2" role="tab" aria-controls="profile" aria-selected="false">Insurance Tab 2</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="insurance-three-tab" data-toggle="tab" href="#insurance-tab3" role="tab" aria-controls="contact" aria-selected="false">Insurance Tab 3</a>
-                </li>
-            </ul>
-            <div class="tab-content" id="tabs_Content_Insurance">
-                <div class="tab-pane fade show active" id="insurance-tab1" role="tabpanel" aria-labelledby="insurance-tab1" data-val-file-prefix='./data/insurance-tab1' data-val-filterby="by-all" data-val-config-path="./data/config.csv">
-                    <div>
-                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
-                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
-                        </select>
-                        <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
-                        </div>
-                    </div>
-                    <div>
-                        <iframe class="responsive_iframe" src="./data/insurance-tab1---.html" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="insurance-tab2" role="tabpanel" aria-labelledby="insurance-tab2" data-val-file-prefix='./data/insurance-tab2' data-val-filterby="by-all"  data-val-config-path="./data/config.csv">
-                    <div>
-                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
-                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
-                        </select>
-                        <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
-                        </div>
-                    </div>
-                    <div>
-                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="insurance-tab3" role="tabpanel" aria-labelledby="insurance-tab3" data-val-file-prefix='./data/insurance-tab3' data-val-filterby="by-1"  data-val-config-path="./data/config.csv">
-                    <div>
-                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
-                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
-                        </select>
-                        <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
                         </div>
                     </div>
                     <div>
