@@ -235,7 +235,10 @@
                         for( let i = 0, len = vals.length; i < len; i++ ){
                             $(vals[i]).text(' -- ');
                         }
+                        //$(iframeDoc).find("head").append('<link rel="preconnect" href="https://fonts.gstatic.com">')
+                        //$(iframeDoc).find("head").append('<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">')
                         $(iframeDoc).find("body").css("padding", "20px 10px 0px 10px")
+                        //$(iframeDoc).find("body").css("font-family", "'Montserrat', sans-serif")
 
                         //Find all cells without an up/down/flat indicator and add it
                         //This is being done b/c we didn't know how to add it within RStudio
@@ -456,12 +459,6 @@
                     <li class="nav-item">
                         <a class="nav-link" id="health-six-tab" data-toggle="tab" href="#health-tab6" role="tab" aria-controls="home" aria-selected="true">Coverage for Specific Health Services</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="health-seven-tab" data-toggle="tab" href="#health-tab7" role="tab" aria-controls="profile" aria-selected="false">Example B</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="health-eight-tab" data-toggle="tab" href="#health-tab8" role="tab" aria-controls="contact" aria-selected="false">Example C</a>
-                    </li>
                 </ul>
             </div>
             <div class="tab-content" id="tabs_Content_Health">
@@ -473,8 +470,6 @@
                         <option value="health-four-tab">Supplemental Health Ins.</option>
                         <option value="health-five-tab">Disability & Accident Ins.</option>
                         <option value="health-six-tab">Coverage for Specific Health Services</option>
-                        <option value="health-seven-tab">Example B</option>
-                        <option value="health-eight-tab">Example C</option>
                     </select>
                 </div>
                 <div class="tab-pane fade show active" id="health-tab1" role="tabpanel" aria-labelledby="health-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/GenHealth/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
