@@ -11,6 +11,8 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
 
         <!-- Optional theme -->
         <link rel="stylesheet" ohref="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
@@ -235,11 +237,11 @@
                         for( let i = 0, len = vals.length; i < len; i++ ){
                             $(vals[i]).text(' -- ');
                         }
-                        //$(iframeDoc).find("head").append('<link rel="preconnect" href="https://fonts.gstatic.com">')
-                        //$(iframeDoc).find("head").append('<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">')
-                        $(iframeDoc).find("body").css("padding", "20px 10px 0px 10px")
-                        //$(iframeDoc).find("body").css("font-family", "'Montserrat', sans-serif")
-
+                        $(iframeDoc).find("body").append('<link rel="preconnect" href="https://fonts.gstatic.com">')
+                        $(iframeDoc).find("body").append('<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">')
+                        $(iframeDoc).find("body").css("font-family", "'Montserrat', sans-serif")
+                        $(iframeDoc).find("body").css("padding", "15px 0px 1px 0px")
+                        
                         //Find all cells without an up/down/flat indicator and add it
                         //This is being done b/c we didn't know how to add it within RStudio
                         var vals = $(iframeDoc).find("body").find('.glyphicon-')
@@ -393,6 +395,15 @@
         </script>
 
         <style>
+            body {
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 400;
+            }
+
+            .dropdown-item {
+                font-weight: 500;
+            }
+
             div.drilldown {
                 background-color:white;
                 margin-left: 20px;
@@ -411,7 +422,8 @@
             }
 
             a.nav-link {color: #333333;}
-            .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {color: #000000;}
+
+            .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {color: #000000; font-weight: 500;}
 
             @media screen and (max-width: 1200px) {
                 .nav_layer1{ display: contents; }
@@ -434,7 +446,7 @@
                 ocolor: #000;
             }
         </style>
-
+        
     </head>
 
     <body ostyle="max-width:1275px">
@@ -488,7 +500,7 @@
                         </select>
                         -->
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         </div>
                     </div>
                     <div>
@@ -501,7 +513,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         </div>
                     </div>
                     <div>
@@ -514,7 +526,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         </div>
                     </div>
                     <div>
@@ -527,7 +539,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         </div>
                     </div>
                     <div>
@@ -540,7 +552,7 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         </div>
                     </div>
                     <div>
@@ -553,53 +565,11 @@
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         </div>
                     </div>
                     <div>
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="health-tab7" role="tabpanel" aria-labelledby="health-tab7" data-val-filterby="by-3" data-val-file-prefix='./data/genhealth/GenHealth' data-val-config-path="./data/config.csv">
-                    <div>
-                        <select class="col-md-2 selectpicker selectpicker-1" data-size="6">
-                            <option value="" data-val="all">All Regions</option>
-                        </select>
-                        <span class="ors"> OR </span>
-                        <select required="required" class="col-md-2 selectpicker selectpicker-2" data-size="6">
-                            <option value="" data-val="all">All Industries</option>
-                        </select>
-                        <span class="ors"> OR </span>
-                        <select required="required" class="col-md-2 selectpicker selectpicker-3" data-size="6">
-                            <option value="" data-val="all">All Orgs</option>
-                        </select>
-                        <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
-                        </div>
-                    </div>
-                    <div>
-                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="health-tab8" role="tabpanel" aria-labelledby="health-tab8" data-val-filterby="by-all" data-val-file-prefix='./data/genhealth/GenHealth' data-val-config-path="./data/config.csv">
-                    <div>
-                        <select class="col-md-2 selectpicker selectpicker-1" data-size="6">
-                            <option value="" data-val="all">All Regions</option>
-                        </select>
-                        <span class="ors"> OR </span>
-                        <select required="required" class="col-md-2 selectpicker selectpicker-2" data-size="6">
-                            <option value="" data-val="all">All Industries</option>
-                        </select>
-                        <span class="ors"> OR </span>
-                        <select required="required" class="col-md-2 selectpicker selectpicker-3" data-size="6">
-                            <option value="" data-val="all">All Orgs</option>
-                        </select>
-                        <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-search" aria-hidden="true"></span> Search </button>
-                        </div>
-                    </div>
-                    <div>
-                        <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0"></iframe>
                     </div>
                 </div>
             </div>
