@@ -237,9 +237,9 @@
                         for( let i = 0, len = vals.length; i < len; i++ ){
                             $(vals[i]).text(' -- ');
                         }
-                        $(iframeDoc).find("body").append('<link rel="preconnect" href="https://fonts.gstatic.com">')
-                        $(iframeDoc).find("body").append('<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">')
-                        $(iframeDoc).find("body").css("font-family", "'Montserrat', sans-serif")
+                        //$(iframeDoc).find("body").append('<link rel="preconnect" href="https://fonts.gstatic.com">')
+                        //$(iframeDoc).find("body").append('<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">')
+                        //$(iframeDoc).find("body").css("font-family", "'Montserrat', sans-serif")
                         $(iframeDoc).find("body").css("padding", "15px 50px 1px 20px")
                         
                         //Find all cells without an up/down/flat indicator and add it
@@ -484,10 +484,10 @@
                         <option value="health-six-tab">Coverage for Specific Health Services</option>
                     </select>
                 </div>
-                <div class="tab-pane fade show active" id="health-tab1" role="tabpanel" aria-labelledby="health-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/GenHealth/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                <div class="tab-pane fade show active" id="health-tab1" role="tabpanel" aria-labelledby="health-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/Health/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
                     <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
-                            <option value="<>" data-val="all">All (Regions, Industries and Org Sizes)</option>
+                            <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <!--
                         <span class="ors"> OR </span>
@@ -504,10 +504,10 @@
                         </div>
                     </div>
                     <div>
-                        <iframe class="responsive_iframe" src="data/GenHealth/GenHealth----.html" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
+                        <iframe class="responsive_iframe" src="data/Health/GenHealth----.html" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab2" role="tabpanel" aria-labelledby="health-tab2" data-val-filterby="by-1" data-val-file-prefix='./data/HealthSavings/HealthSavings' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                <div class="tab-pane fade" id="health-tab2" role="tabpanel" aria-labelledby="health-tab2" data-val-filterby="by-1" data-val-file-prefix='./data/Health/HealthSavings' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
                     <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
@@ -520,7 +520,7 @@
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab3" role="tabpanel" aria-labelledby="health-tab3" data-val-filterby="by-1" data-val-file-prefix='./data/PrescriptionDrugs/PrescriptionDrugs' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                <div class="tab-pane fade" id="health-tab3" role="tabpanel" aria-labelledby="health-tab3" data-val-filterby="by-1" data-val-file-prefix='./data/Health/PrescriptionDrugs' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
                     <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
@@ -533,7 +533,7 @@
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab4" role="tabpanel" aria-labelledby="health-tab4" data-val-filterby="by-1" data-val-file-prefix='./data/Dental_Vision/Dental_Vision' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                <div class="tab-pane fade" id="health-tab4" role="tabpanel" aria-labelledby="health-tab4" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Dental_Vision' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
                     <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
@@ -546,7 +546,7 @@
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab5" role="tabpanel" aria-labelledby="health-tab5" data-val-filterby="by-1" data-val-file-prefix='./data/DisabilityAccident/DisabilityAccident' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                <div class="tab-pane fade" id="health-tab5" role="tabpanel" aria-labelledby="health-tab5" data-val-filterby="by-1" data-val-file-prefix='./data/Health/DisabilityAccident' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
                     <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
@@ -559,7 +559,7 @@
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab6" role="tabpanel" aria-labelledby="health-tab6" data-val-filterby="by-1" data-val-file-prefix='./data/Specific_Services/Specific_Services' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                <div class="tab-pane fade" id="health-tab6" role="tabpanel" aria-labelledby="health-tab6" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Specific_Services' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
                     <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
