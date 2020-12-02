@@ -2,33 +2,19 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         
-        <!--
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
-        -->
-
         <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" ohref="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
 
-        <!-- Optional theme -->
-        <link rel="stylesheet" ohref="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
-
         <!-- Latest compiled and minified JavaScript -->
-        <script osrc="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js"></script>
         
         <script>
-            /*
-            $(function() {
-                //alert( "the document is ready!" );
-            });
-            */
-
             var SHRM = SHRM || {};
             SHRM.utils = {};
 
@@ -179,6 +165,51 @@
                     return s.charAt(0).toUpperCase() + s.slice(1)
                 };
 
+                this.prepHTML2CSV = function(arr, columnCount, initial){
+                    /*
+                    * Convert data array to CSV string
+                    * @param arr {Array} - the actual data
+                    * @param columnCount {Number} - the amount to split the data into columns
+                    * @param initial {String} - initial string to append to CSV string
+                    * return {String} - ready CSV string
+                    */
+
+                    var row = ''; // this will hold data
+                    var delimeter = ','; // data slice separator, in excel it's `;`, in usual CSv it's `,`
+                    var newLine = '\r\n'; // newline separator for CSV row
+
+                    /*
+                    * Convert [1,2,3,4] into [[1,2], [3,4]] while count is 2
+                    * @param _arr {Array} - the actual array to split
+                    * @param _count {Number} - the amount to split
+                    * return {Array} - splitted array
+                    */
+                    function splitArray(_arr, _count) {
+                        var splitted = [];
+                        var result = [];
+                        _arr.forEach(function(item, idx) {
+                        if ((idx + 1) % _count === 0) {
+                            splitted.push(item);
+                            result.push(splitted);
+                            splitted = [];
+                        } else {
+                            splitted.push(item);
+                        }
+                        });
+                        return result;
+                    }
+                    var plainArr = splitArray(arr, columnCount);
+                    // don't know how to explain this, so you'll just have to like follow the code to understand
+                    // it converts `['a', 'b', 'c']` to `a,b,c` string
+                    plainArr.forEach(function(arrItem) {
+                        arrItem.forEach(function(item, idx) {
+                        row += item + ((idx + 1) === arrItem.length ? '' : delimeter);
+                        });
+                        row += newLine;
+                    });
+                    return initial + row;
+                };
+
             }).apply(SHRM.utils);
 
             function initDrillDown(objContainter){
@@ -217,7 +248,8 @@
             };
 
             $(document).ready(function() {
-                console.time('Page load')
+                console.time('Page load');
+
                 SHRM.utils.globalConfigKeys = ['region','industry','orgsize']
 
                 $('iframe').on('load', function (event){
@@ -282,7 +314,7 @@
                     //console.log('on resize');
                 } );
 
-                $('.btn').on('click', function (event){
+                $('.btn-filter').on('click', function (event){
                     var src = $(event.target).closest('.tab-pane').attr('data-val-file-prefix') + '-'
                     
                     if ($( event.target ).closest('.tab-pane').attr('data-val-filterby') == 'by-1'){
@@ -308,7 +340,8 @@
                     
                     //$(event.target).closest('.tab-pane').find('.responsive_iframe').attr('src', src.toLowerCase())
                     $(event.target).closest('.tab-pane').find('.responsive_iframe').attr('src', src)
-                    
+                    $(event.target).closest('.tab-pane').find('.btn-export').removeClass('disabled');
+
                     console.log('on click: ' + src);
                 });
 
@@ -319,11 +352,11 @@
                         url = arrHREF[1]
                         var obj = $('#' + url)
                     }
-
+                    
                     if ((obj) && (obj.is(':visible'))){
                         //if ($( window ).attr('loaded')){
-                            obj.find('.btn').trigger('click')
-                            obj.find('.btn').focus()
+                            obj.find('.btn-filter').trigger('click')
+                            obj.find('.selectpicker').focus()
                             console.log('shown.bs.tab: ' + obj.is(':visible'))
                         //}
                     }
@@ -351,6 +384,8 @@
                             SHRM.utils.resetDrillDownSiblings('selectpicker-1', objContainter.find('select'));
                         };
                     }
+
+                    $( event.target ).closest('.tab-pane').find('.btn-export').addClass('disabled')
                 });
 
                 $('.selectpicker-2').on('change', function (event) {
@@ -388,9 +423,110 @@
                     $('#' + $( event.target ).val()).trigger('click')
                 });
 
-                initDrillDown($('#health-tab1'));
+                $('.export_as_csv').on('click', function(event) {
+                    var iframes = $( event.target ).closest('.tab-pane').find('iframe')
+                    
+                    for( var i = 0; i < iframes.length; i++) {
+                        if ($(iframes[i])[0].contentDocument.title.indexOf("404") >= 0){
+                            console.log("404 Error: Couldn't locate " + $(iframes[i])[0].src)
+                            $(iframes[i])[0].src = 'about:blank'
+                        }
+
+                        var iframeDoc = $(iframes[i])[0].contentWindow.document;
+                        var titles = [];
+                        var data = [];
+
+                        //Get the table headers (-- no empty column headers), this will be CSV headers
+                        //The count of headers will be CSV string separator
+                        $(iframeDoc).find('.table th').each(function() {
+                            title = $(this).text().trim()
+                            if (title.length > 0) {
+                            titles.push(title);
+                            }
+                        });
+
+                        //Get the actual data, this will contain all the data, in 1 array
+                        maxCols = titles.length
+                        $(iframeDoc).find('.table tr').each(function(index, obj) {
+                            //if (colCount < maxCols) {
+                                //data.push($(this).text());
+                            //}
+                            colCount = 0
+                            $( obj ).find('td').each(function(){
+                                if (colCount < maxCols) {
+                                    content = $(this).text().trim();
+                                    data.push(content);
+                                }
+                                colCount += 1
+                            });
+                        });
+
+                        //Convert our data to CSV string
+                        var CSVString = SHRM.utils.prepHTML2CSV(titles, titles.length, '');
+                        CSVString = SHRM.utils.prepHTML2CSV(data, titles.length, CSVString);
+
+                        //Add SHRM Copyright
+                        emptyColumns = ',';
+                        CSVString += 'Copyright \u00A9 2020 Society for Human Resource Management \u00B7 Source: Employee Benefits 2020' + emptyColumns.repeat(titles.length-1) + '\n'
+
+                        //Make CSV downloadable
+                        var downloadLink = document.createElement("a");
+                        var blob = new Blob(["\ufeff", CSVString]);
+                        var url = URL.createObjectURL(blob);
+
+                        downloadLink.href = url;
+                        
+                        //Create Name for download file - safe for windows, mac, etc
+                        var $tab = $('.nav-tabs'), $active = $tab.find('.nav-link.active'), tab_text = $active.text();
+                        var select_text = $( event.target ).closest('.tab-pane').find('.selectpicker-1 option:selected').text();
+                        downloadName = 'SHRM Benefits 2020 - ' + tab_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + select_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim()
+                        downloadName = downloadName.replace('   ', ' ')
+                        downloadName = downloadName.replace('  ', ' ')
+                        //downloadLink.download = string(downloadName)  //I don't know why this method does not work.
+                        downloadLink.download = "data.csv".replace('data', downloadName);
+
+                        //Actually download CSV
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+                    }
+                });
+
+                $('.export_as_image').on('click', function(event) {
+                    alert('Coming Soon.');
+                    return;
+                    var iframes = $( event.target ).closest('.tab-pane').find('iframe')
+                    
+                    for( var i = 0; i < iframes.length; i++) {
+                        var iframeDoc = $(iframes[i])[0].contentWindow.document;
+                        
+                        $('.drilldown_image').append(iframeDoc.body.outerHTML).append($('.drilldown_footer')[0].outerHTML);
+                        html2canvas(document.querySelector('.drilldown_image')).then(canvas => {
+                            console.log(canvas);
+                            //saveAs(canvas.toDataURL(), 'file-name.png');
+
+                            //Create Name for download file - safe for windows, mac, etc
+                            var $tab = $('.nav-tabs'), $active = $tab.find('.nav-link.active'), tab_text = $active.text();
+                            var select_text = $( event.target ).closest('.tab-pane').find('.selectpicker-1 option:selected').text();
+                            downloadName = 'SHRM Benefits 2020 - ' + tab_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + select_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim()
+                            downloadName = downloadName.replace('   ', ' ')
+                            downloadName = downloadName.replace('  ', ' ')
+
+                            var link = document.createElement("a");
+                            document.body.appendChild(link);
+                            link.download = downloadName + '.png'       //link.download = "data.png";
+                            link.href = canvas.toDataURL("image/png");
+                            link.target = '_blank';
+                            link.click();
+
+                            //$('.drilldown_image').empty()
+                        });
+                    }
+                });
+
+                initDrillDown($('#drilldown-tab1'));
                 
-                console.timeEnd('Page load') 
+                console.timeEnd('Page load');
             });
         </script>
 
@@ -398,6 +534,25 @@
             body {
                 font-family: 'Montserrat', sans-serif;
                 font-weight: 400;
+            }
+
+            .table {
+                padding: 5px !important;
+                line-height: 1.42857143 !important;
+                vertical-align: top !important;
+                border-top: 1px solid #ddd !important;
+                font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+                font-size: 14px !important;
+                
+            }
+
+            .table>thead>tr>th {
+                font-weight: bold !important;
+                padding: 5px !important;
+            }
+
+            .table>tbody>tr>td {
+                padding: 5px !important;
             }
 
             .dropdown-item {
@@ -419,6 +574,20 @@
                 display: block;
                 width: 100%;
                 height: 100%;
+            }
+
+            span.drilldown_footer {
+                font-family: Roboto, sans-serif;
+                font-weight: 400;
+                font-size: 11px;
+                text-decoration: none;
+                color: #888;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: center;
+                padding-left:25px;
+                width: 100%;
             }
 
             a.nav-link {color: #333333;}
@@ -445,48 +614,62 @@
             .bootstrap-select>.dropdown-toggle.bs-placeholder, .bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover {
                 ocolor: #000;
             }
+
+            @media not all and (min-resolution:.001dpcm) { 
+                @supports (-webkit-appearance:none) {
+                    .action_bar {
+                        height: 40px;
+                    }
+
+                    .action_bar>select {
+                        height: 35px;
+                    }
+                }
+            }
+
+            
         </style>
         
     </head>
 
     <body ostyle="max-width:1275px">
-        <div class="drilldown" id="drilldown_benefits_health">
+        <div class="drilldown" id="drilldown_benefits_2020">
             <div class="nav_layer2">
-                <ul class="nav nav-tabs" id="tabs_Health" role="tablist" ostyle="display: none;">
+                <ul class="nav nav-tabs" id="tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="health-one-tab" data-toggle="tab" href="#health-tab1" role="tab" aria-controls="home" aria-selected="true">General Health</a>
+                        <a class="nav-link active" id="drilldown-one-tab" data-toggle="tab" href="#drilldown-tab1" role="tab" aria-controls="home" aria-selected="true">General Health</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="health-two-tab" data-toggle="tab" href="#health-tab2" role="tab" aria-controls="home" aria-selected="true">HSA & FSA</a>
+                        <a class="nav-link" id="drilldown-two-tab" data-toggle="tab" href="#drilldown-tab2" role="tab" aria-controls="home" aria-selected="true">HSA & FSA</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="health-three-tab" data-toggle="tab" href="#health-tab3" role="tab" aria-controls="home" aria-selected="true">Prescription Drug</a>
+                        <a class="nav-link" id="drilldown-three-tab" data-toggle="tab" href="#drilldown-tab3" role="tab" aria-controls="home" aria-selected="true">Prescription Drug</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="health-four-tab" data-toggle="tab" href="#health-tab4" role="tab" aria-controls="home" aria-selected="true">Supplemental Health Ins.</a>
+                        <a class="nav-link" id="drilldown-four-tab" data-toggle="tab" href="#drilldown-tab4" role="tab" aria-controls="home" aria-selected="true">Supplemental Health Ins.</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="health-five-tab" data-toggle="tab" href="#health-tab5" role="tab" aria-controls="home" aria-selected="true">Disability & Accident Ins.</a>
+                        <a class="nav-link" id="drilldown-five-tab" data-toggle="tab" href="#drilldown-tab5" role="tab" aria-controls="home" aria-selected="true">Disability & Accident Ins.</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="health-six-tab" data-toggle="tab" href="#health-tab6" role="tab" aria-controls="home" aria-selected="true">Coverage for Specific Health Services</a>
+                        <a class="nav-link" id="drilldown-six-tab" data-toggle="tab" href="#drilldown-tab6" role="tab" aria-controls="home" aria-selected="true">Coverage for Specific Health Services</a>
                     </li>
                 </ul>
             </div>
             <div class="tab-content" id="tabs_Content_Health">
                 <div class="nav_layer1">
                     <select class="col-md-4 selectpicker navpicker" data-size="9">
-                        <option value="health-one-tab">General Health</option>
-                        <option value="health-two-tab">HSA & FSA</option>
-                        <option value="health-three-tab">Prescription Drug</option>
-                        <option value="health-four-tab">Supplemental Health Ins.</option>
-                        <option value="health-five-tab">Disability & Accident Ins.</option>
-                        <option value="health-six-tab">Coverage for Specific Health Services</option>
+                        <option value="drilldown-one-tab">General Health</option>
+                        <option value="drilldown-two-tab">HSA & FSA</option>
+                        <option value="drilldown-three-tab">Prescription Drug</option>
+                        <option value="drilldown-four-tab">Supplemental Health Ins.</option>
+                        <option value="drilldown-five-tab">Disability & Accident Ins.</option>
+                        <option value="drilldown-six-tab">Coverage for Specific Health Services</option>
                     </select>
                 </div>
-                <div class="tab-pane fade show active" id="health-tab1" role="tabpanel" aria-labelledby="health-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/Health/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div>
-                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
+                <div class="tab-pane fade show active" id="drilldown-tab1" role="tabpanel" aria-labelledby="drilldown-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/Health/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div class="action_bar">
+                        <select class="col-md-4 selectpicker selectpicker-1" data-size="9" style="height: 35px">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <!--
@@ -500,72 +683,126 @@
                         </select>
                         -->
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Export
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item export_as_csv" href="#">as CSV</a>
+                                    <a class="dropdown-item export_as_image" href="#">as Image</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <iframe class="responsive_iframe" src="data/Health/GenHealth----.html" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab2" role="tabpanel" aria-labelledby="health-tab2" data-val-filterby="by-1" data-val-file-prefix='./data/Health/HealthSavings' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div>
+                <div class="tab-pane fade" id="drilldown-tab2" role="tabpanel" aria-labelledby="drilldown-tab2" data-val-filterby="by-1" data-val-file-prefix='./data/Health/HealthSavings' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div class="action_bar">
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Export
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item export_as_csv" href="#">as CSV</a>
+                                    <a class="dropdown-item export_as_image" href="#">as Image</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab3" role="tabpanel" aria-labelledby="health-tab3" data-val-filterby="by-1" data-val-file-prefix='./data/Health/PrescriptionDrugs' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div>
+                <div class="tab-pane fade" id="drilldown-tab3" role="tabpanel" aria-labelledby="drilldown-tab3" data-val-filterby="by-1" data-val-file-prefix='./data/Health/PrescriptionDrugs' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div class="action_bar">
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Export
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item export_as_csv" href="#">as CSV</a>
+                                    <a class="dropdown-item export_as_image" href="#">as Image</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab4" role="tabpanel" aria-labelledby="health-tab4" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Dental_Vision' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div>
+                <div class="tab-pane fade" id="drilldown-tab4" role="tabpanel" aria-labelledby="drilldown-tab4" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Dental_Vision' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div class="action_bar">
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Export
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item export_as_csv" href="#">as CSV</a>
+                                    <a class="dropdown-item export_as_image" href="#">as Image</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab5" role="tabpanel" aria-labelledby="health-tab5" data-val-filterby="by-1" data-val-file-prefix='./data/Health/DisabilityAccident' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div>
+                <div class="tab-pane fade" id="drilldown-tab5" role="tabpanel" aria-labelledby="drilldown-tab5" data-val-filterby="by-1" data-val-file-prefix='./data/Health/DisabilityAccident' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div class="action_bar">
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Export
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item export_as_csv" href="#">as CSV</a>
+                                    <a class="dropdown-item export_as_image" href="#">as Image</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="health-tab6" role="tabpanel" aria-labelledby="health-tab6" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Specific_Services' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div>
+                <div class="tab-pane fade" id="drilldown-tab6" role="tabpanel" aria-labelledby="drilldown-tab6" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Specific_Services' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
+                    <div class="action_bar">
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
                         <div class="col-md-2" style="display:inline-block">
-                            <button type="button" class="btn btn-primary btn-sm"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Export
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item export_as_csv" href="#">as CSV</a>
+                                    <a class="dropdown-item export_as_image" href="#">as Image</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -573,6 +810,8 @@
                     </div>
                 </div>
             </div>
+            <span class="drilldown_footer">Chart: &#169; 2020 Society for Human Resource Management &middot; Source: Employee Benefits 2020</span>
         </div>
+        <div class='drilldown_image' style="z-index:-1000;top:0px;left:-25999px;position:absolute"></div>
     </body>
 </html>
