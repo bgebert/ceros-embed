@@ -355,9 +355,14 @@
                     
                     if ((obj) && (obj.is(':visible'))){
                         //if ($( window ).attr('loaded')){
-                            obj.find('.btn-filter').trigger('click')
-                            obj.find('.selectpicker').focus()
-                            console.log('shown.bs.tab: ' + obj.is(':visible'))
+                        if (SHRM.utils.benefitCategory){
+                            obj.find('.selectpicker-1').val(SHRM.utils.benefitCategory)
+                            obj.find(".selectpicker-1 option[value='" + SHRM.utils.benefitCategory + "']").prop("selected", true);
+                            obj.find('.filter-option-inner-inner').text(obj.find(".selectpicker-1 option[value='" + SHRM.utils.benefitCategory + "']").text())
+                        }
+                        obj.find('.btn-filter').trigger('click')
+                        obj.find('.selectpicker').focus()
+                        console.log('shown.bs.tab: ' + obj.is(':visible'))
                         //}
                     }
                 });
@@ -386,6 +391,12 @@
                     }
 
                     $( event.target ).closest('.tab-pane').find('.btn-export').addClass('disabled')
+
+                    // to auto load the data without having to select the Filter button...
+                    // uncomment the lines below and add the 'hidden' to all of the filter buttons
+                    
+                    //SHRM.utils.benefitCategory = $( event.target ).val()
+                    //$( event.target ).closest('.tab-pane').find('.btn-filter').trigger('click')
                 });
 
                 $('.selectpicker-2').on('change', function (event) {
@@ -419,11 +430,11 @@
                     }
                 });
                 
-                $('.navpicker').on('change', function(event){
+                $('.navpicker').on('change', function (event) {
                     $('#' + $( event.target ).val()).trigger('click')
                 });
 
-                $('.export_as_csv').on('click', function(event) {
+                $('.export_as_csv').on('click', function (event) {
                     var iframes = $( event.target ).closest('.tab-pane').find('iframe')
                     
                     for( var i = 0; i < iframes.length; i++) {
@@ -492,9 +503,9 @@
                     }
                 });
 
-                $('.export_as_image').on('click', function(event) {
-                    alert('Coming Soon.');
-                    return;
+                $('.export_as_image').on('click', function (event) {
+                    //alert('Coming Soon.');
+                    //return;
                     var iframes = $( event.target ).closest('.tab-pane').find('iframe')
                     
                     for( var i = 0; i < iframes.length; i++) {
@@ -594,12 +605,12 @@
 
             .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {color: #000000; font-weight: 500;}
 
-            @media screen and (max-width: 1200px) {
+            @media screen and (max-width: 1275px) {
                 .nav_layer1{ display: contents; }
                 .nav_layer2{ display: none; }
             }
 
-            @media screen and (min-width: 1200px) {
+            @media screen and (min-width: 1275px) {
                 .nav_layer1{ display: none; }
                 .nav_layer2{ display: block; }
             }
@@ -617,11 +628,7 @@
 
             @media not all and (min-resolution:.001dpcm) { 
                 @supports (-webkit-appearance:none) {
-                    .action_bar {
-                        height: 40px;
-                    }
-
-                    .action_bar>select {
+                    .bootstrap-select {
                         height: 35px;
                     }
                 }
@@ -634,29 +641,29 @@
 
     <body ostyle="max-width:1275px">
         <div class="drilldown" id="drilldown_benefits_2020">
-            <div class="nav_layer2">
-                <ul class="nav nav-tabs" id="tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="drilldown-one-tab" data-toggle="tab" href="#drilldown-tab1" role="tab" aria-controls="home" aria-selected="true">General Health</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="drilldown-two-tab" data-toggle="tab" href="#drilldown-tab2" role="tab" aria-controls="home" aria-selected="true">HSA & FSA</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="drilldown-three-tab" data-toggle="tab" href="#drilldown-tab3" role="tab" aria-controls="home" aria-selected="true">Prescription Drug</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="drilldown-four-tab" data-toggle="tab" href="#drilldown-tab4" role="tab" aria-controls="home" aria-selected="true">Supplemental Health Ins.</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="drilldown-five-tab" data-toggle="tab" href="#drilldown-tab5" role="tab" aria-controls="home" aria-selected="true">Disability & Accident Ins.</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="drilldown-six-tab" data-toggle="tab" href="#drilldown-tab6" role="tab" aria-controls="home" aria-selected="true">Coverage for Specific Health Services</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="tab-content" id="tabs_Content_Health">
+            <div class="tab-content" oid="tabs_Content_Health">
+                <div class="nav_layer2">
+                    <ul class="nav nav-tabs" id="tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="drilldown-one-tab" data-toggle="tab" href="#drilldown-tab1" role="tab" aria-controls="home" aria-selected="true">General Health</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="drilldown-two-tab" data-toggle="tab" href="#drilldown-tab2" role="tab" aria-controls="home" aria-selected="true">HSA & FSA</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="drilldown-three-tab" data-toggle="tab" href="#drilldown-tab3" role="tab" aria-controls="home" aria-selected="true">Prescription Drug</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="drilldown-four-tab" data-toggle="tab" href="#drilldown-tab4" role="tab" aria-controls="home" aria-selected="true">Supplemental Health Ins.</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="drilldown-five-tab" data-toggle="tab" href="#drilldown-tab5" role="tab" aria-controls="home" aria-selected="true">Disability & Accident Ins.</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="drilldown-six-tab" data-toggle="tab" href="#drilldown-tab6" role="tab" aria-controls="home" aria-selected="true">Coverage for Specific Health Services</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="nav_layer1">
                     <select class="col-md-4 selectpicker navpicker" data-size="9">
                         <option value="drilldown-one-tab">General Health</option>
@@ -668,7 +675,7 @@
                     </select>
                 </div>
                 <div class="tab-pane fade show active" id="drilldown-tab1" role="tabpanel" aria-labelledby="drilldown-tab1" data-val-filterby="by-1" data-val-file-prefix='./data/Health/GenHealth' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div class="action_bar">
+                    <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9" style="height: 35px">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
@@ -682,7 +689,7 @@
                             <option value="" data-val="all">All Orgs</option>
                         </select>
                         -->
-                        <div class="col-md-2" style="display:inline-block">
+                        <div class="col-md-3" style="display:inline-block">
                             <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -700,11 +707,11 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="drilldown-tab2" role="tabpanel" aria-labelledby="drilldown-tab2" data-val-filterby="by-1" data-val-file-prefix='./data/Health/HealthSavings' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div class="action_bar">
+                    <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
-                        <div class="col-md-2" style="display:inline-block">
+                        <div class="col-md-3" style="display:inline-block">
                             <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -722,11 +729,11 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="drilldown-tab3" role="tabpanel" aria-labelledby="drilldown-tab3" data-val-filterby="by-1" data-val-file-prefix='./data/Health/PrescriptionDrugs' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div class="action_bar">
+                    <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
-                        <div class="col-md-2" style="display:inline-block">
+                        <div class="col-md-3" style="display:inline-block">
                             <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -744,11 +751,11 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="drilldown-tab4" role="tabpanel" aria-labelledby="drilldown-tab4" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Dental_Vision' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div class="action_bar">
+                    <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
-                        <div class="col-md-2" style="display:inline-block">
+                        <div class="col-md-3" style="display:inline-block">
                             <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -766,11 +773,11 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="drilldown-tab5" role="tabpanel" aria-labelledby="drilldown-tab5" data-val-filterby="by-1" data-val-file-prefix='./data/Health/DisabilityAccident' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div class="action_bar">
+                    <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
-                        <div class="col-md-2" style="display:inline-block">
+                        <div class="col-md-3" style="display:inline-block">
                             <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -788,11 +795,11 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="drilldown-tab6" role="tabpanel" aria-labelledby="drilldown-tab6" data-val-filterby="by-1" data-val-file-prefix='./data/Health/Specific_Services' data-val-config-keys="['region','industry','orgsize']" data-val-config-path="./data/config.csv">
-                    <div class="action_bar">
+                    <div>
                         <select class="col-md-4 selectpicker selectpicker-1" data-size="9">
                             <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         </select>
-                        <div class="col-md-2" style="display:inline-block">
+                        <div class="col-md-3" style="display:inline-block">
                             <button type="button" class="btn btn-primary btn-sm btn-filter"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm btn-export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
