@@ -1,5 +1,13 @@
 <html>
     <head>
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-N6W5WC');</script>
+        <!-- End Google Tag Manager -->
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         
         <!-- Latest compiled and minified CSS -->
@@ -18,7 +26,7 @@
         <script>
             var SHRM = SHRM || {};
             SHRM.utils = {};
-
+            
             (function () {
                 this.getRemoteData = function (path_to_csv){
                     if (this.ajaxResults[path_to_csv]){
@@ -80,7 +88,6 @@
 
                 this.configureDropDowns = function (dataObj, key, selectObj, optgroup_label) {
                     result = this.getDistinctVals(dataObj, key)
-                    //debugger
                     var $optgroup = selectObj
                     if (optgroup_label){
                         $optgroup = $("<optgroup label='" + optgroup_label + "'>"); 
@@ -211,9 +218,26 @@
                     return initial + row;
                 };
 
+                this.getUrlParameter = function getUrlParameter(sParam) {
+                    var sPageURL = window.location.search.substring(1),
+                        sURLVariables = sPageURL.split('&'),
+                        sParameterName,
+                        i;
+
+                    for (i = 0; i < sURLVariables.length; i++) {
+                        sParameterName = sURLVariables[i].split('=');
+
+                        if (sParameterName[0] === sParam) {
+                            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                        }
+                    }
+                    return false;
+                };
+
             }).apply(SHRM.utils);
 
             function initDrillDown(objContainter){
+                //alert('initDrillDown')
                 if (objContainter.attr('loaded') === undefined){
                     var arrConfigKeys = SHRM.utils.globalConfigKeys;
 
@@ -248,11 +272,117 @@
                 }
             };
 
+            function initDefaults(globalConfigKeys, TopLevelType, SubLevelType, selectpicker = null, categoryType = null){
+                //debugger
+                SHRM.utils.globalConfigKeys = globalConfigKeys
+                SHRM.utils.TopLevelType = TopLevelType
+                SHRM.utils.SubLevelType = SubLevelType
+                
+                SHRM.utils[SHRM.utils.TopLevelType] = {}
+                SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType] = {}
+                SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryType = categoryType
+                SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 = selectpicker
+                SHRM.utils[SHRM.utils.TopLevelType].exportType = ''
+
+                var bCallUpdateURL = true
+                var arrURLparams = window.location.hash.split('/')
+                if (arrURLparams.length == 5){
+                    // set defaults from URL params
+                    if (String(arrURLparams[1]) != '') { TopLevelType = String(arrURLparams[1])}
+                    if (String(arrURLparams[2]) != '') { SubLevelType = String(arrURLparams[2])}
+                    if ((String(arrURLparams[3]) != '') && (String(arrURLparams[3]) != 'all')) { 
+                        selectpicker = String(arrURLparams[3])
+                        SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 = selectpicker
+                        localStorage.setItem("SHRM.utils." + SHRM.utils.TopLevelType + ".selectpicker_1", selectpicker)
+                    }
+                    if (String(arrURLparams[4]) != '') { 
+                        categoryType = String(arrURLparams[4])
+                        SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryType = '#' + categoryType
+                        localStorage.setItem("SHRM.utils." + SHRM.utils.TopLevelType + "." + SHRM.utils.SubLevelType + ".categoryType", '#' + categoryType)
+                        bCallUpdateURL = false
+                    }
+                }
+
+                // set defaults from local storage
+                if (localStorage.getItem("SHRM.utils." + SHRM.utils.TopLevelType + ".selectpicker_1")){
+                    selectpicker = localStorage.getItem("SHRM.utils." + SHRM.utils.TopLevelType + ".selectpicker_1")
+                    SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 = selectpicker
+                }
+                if (localStorage.getItem("SHRM.utils." + SHRM.utils.TopLevelType + "." + SHRM.utils.SubLevelType + ".categoryType")) {
+                    categoryType = localStorage.getItem("SHRM.utils." + SHRM.utils.TopLevelType + "." + SHRM.utils.SubLevelType + ".categoryType")
+                    SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryType = categoryType
+                    $('a[href$="' + categoryType + '"]').trigger('click')
+                    bCallUpdateURL = false
+                }else{
+                    // No tab (categoryType) has been previously selected, so the 1st tab is loaded by default
+                    // Unfortunately, 'show.bs.tab' is not triggered as expected, so we must force it
+                    $('a[href$="#drilldown-tab1"]').trigger('show.bs.tab')
+                    //initDrillDown($('#drilldown-tab1'))
+                }
+
+                if (bCallUpdateURL) { updateURL() }
+            }
+
+            function updateURL(){
+                url = '#/' + SHRM.utils.TopLevelType + '/' + SHRM.utils.SubLevelType
+                if (SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1){
+                    //url = url + '/' + $('.selectpicker-1').attr('data-val')
+                    url = url + '/' + SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 
+                }else{
+                    //url = url + '/' + $('.selectpicker-1').val()
+                    url = url + '/all'
+                }
+
+                url = url + '/' + SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryType.replace('#','')
+                window.history.replaceState(null, null, url)
+                
+                pushToGTM()
+            }
+
+            function pushToGTM(){
+                if (window.dataLayer){
+                    var event = SHRM.utils.TopLevelType + " | " + SHRM.utils.SubLevelType
+                    var eventCategory = SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryText
+                    var eventLabel = (SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1) ? SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 : 'all'
+                    var eventAction = SHRM.utils[SHRM.utils.TopLevelType].exportType
+                    var eventValue = 0
+                    window.dataLayer.push({            
+                        'event': event,            
+                        'eventCategory': eventCategory,            
+                        'eventLabel': eventLabel,
+                        'eventAction': eventAction,            
+                        'eventValue': eventValue          
+                    });
+                }
+
+                SHRM.utils[SHRM.utils.TopLevelType].exportType = ''
+
+                // The code above does NOT seem to want to appear in Google Analytics.
+                // The code below was written to see if this would work and appear in Google Analytics.
+                
+                //src = 'gtm.html#/' + SHRM.utils.TopLevelType + SHRM.utils.SubLevelType + '/' + eventCategory + '/' + eventLabel
+                //if (eventAction){
+                //    if (eventAction != ''){
+                //        src = src + '/' + eventAction
+                //    }
+                //}
+                
+                src = 'gtm.html?' + 'event=' + event + '&eventCategory=' + eventCategory + '&eventLabel=' + eventLabel
+                if (eventAction){
+                    if (eventAction != ''){
+                        src = src + '&eventAction=' + eventAction
+                    }
+                }
+                $('#gtm').attr('src', src)
+
+                
+            }
+
             $(document).ready(function() {
                 console.time('Page load');
 
-                SHRM.utils.globalConfigKeys = ['region','industry','orgsize']
-
+                window.dataLayer = window.dataLayer || [];
+                
                 $('iframe').on('load', function (event){
                     var iframes = $( event.target ).closest('.tab-pane').find('iframe')
                     var changeDecrease = false;
@@ -352,24 +482,31 @@
                     if (arrHREF.length == 2){
                         url = arrHREF[1]
                         var obj = $('#' + url)
+                        SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryType = '#' + url
+                        localStorage.setItem("SHRM.utils." + SHRM.utils.TopLevelType + "." + SHRM.utils.SubLevelType + ".categoryType", '#' + url)
+                        $('.navpicker option[value=' + $(event.target).attr('id') + ']').attr('selected','selected')
+                        $('.navpicker').trigger('change')
                     }
                     
                     if ((obj) && (obj.is(':visible'))){
                         //if ($( window ).attr('loaded')){
-                        
-                        if (SHRM.utils.benefitCategory){
-                            obj.find('.selectpicker-1').val(SHRM.utils.benefitCategory)
-                            obj.find(".selectpicker-1 option[value='" + SHRM.utils.benefitCategory + "']").prop("selected", true);
-                            obj.find('.filter-option-inner-inner').text(obj.find(".selectpicker-1 option[value='" + SHRM.utils.benefitCategory + "']").text())
+                        if (SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1){
+                            obj.find('.selectpicker-1').val(SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1)
+                            obj.find(".selectpicker-1 option[value='" + SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 + "']").prop("selected", true);
+                            obj.find('.filter-option-inner-inner').text(obj.find(".selectpicker-1 option[value='" + SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 + "']").text())
                         }
                         obj.find('.btn-filter').trigger('click')
                         obj.find('.selectpicker').focus()
                         console.log('shown.bs.tab: ' + obj.is(':visible'))
                         //}
                     }
+
+                    updateURL()
                 });
 
                 $(document).on('show.bs.tab', function (event) {
+                    SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryText = $( event.target ).text()
+                    SHRM.utils[SHRM.utils.TopLevelType][SHRM.utils.SubLevelType].categoryType = $( event.target ).attr('href')
                     id = $( event.target ).attr('href')
                     initDrillDown($(id));
                 });
@@ -394,11 +531,13 @@
 
                     $( event.target ).closest('.tab-pane').find('.btn-export').addClass('disabled')
 
+                    SHRM.utils[SHRM.utils.TopLevelType].selectpicker_1 = $( event.target ).val()
+                    localStorage.setItem("SHRM.utils." + SHRM.utils.TopLevelType + ".selectpicker_1", $( event.target ).val())
                     // to auto load the data without having to select the Filter button...
                     // uncomment the lines below and add the 'hidden' to all of the filter buttons
-                    
-                    SHRM.utils.benefitCategory = $( event.target ).val()
                     $( event.target ).closest('.tab-pane').find('.btn-filter').trigger('click')
+
+                    updateURL()
                 });
 
                 $('.selectpicker-2').on('change', function (event) {
@@ -503,6 +642,9 @@
                         downloadLink.click();
                         document.body.removeChild(downloadLink);
                     }
+
+                    SHRM.utils[SHRM.utils.TopLevelType].exportType = 'CSV'
+                    pushToGTM()
                 });
 
                 $('.export_as_image').on('click', function (event) {
@@ -535,6 +677,9 @@
                             $('.drilldown_image').empty()
                         });
                     }
+
+                    SHRM.utils[SHRM.utils.TopLevelType].exportType = 'Image'
+                    pushToGTM()
                 });
 
                 $('.export_as_pdf').on('click', function (event) {
@@ -565,10 +710,15 @@
                             $('.drilldown_image').empty()
                         });
                     }
+
+                    SHRM.utils[SHRM.utils.TopLevelType].exportType = 'PDF'
+                    pushToGTM()
                 });
 
-                initDrillDown($('#drilldown-tab1'));
+                initDefaults(['region','industry','orgsize'], 'benefitsPortal', 'healthcare', null, 'drilldown-tab1')
                 
+                //updateURL()
+
                 console.timeEnd('Page load');
             });
         </script>
@@ -672,6 +822,10 @@
     </head>
 
     <body ostyle="max-width:1275px">
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+
         <div class="drilldown" id="drilldown_benefits_2020">
             <div class="tab-content" oid="tabs_Content">
                 <div class="nav_layer2">
@@ -858,5 +1012,6 @@
             <span class="drilldown_footer">Chart: &#169; 2020 Society for Human Resource Management &middot; Source: Employee Benefits 2020</span>
         </div>
         <div class='drilldown_image' ostyle="max-width: 1000px" style="max-width: 1000px;z-index:-1000;top:0px;left:-25999px;position:absolute"></div>
+        <iframe id="gtm" src="about:blank" style="display:none"></iframe>
     </body>
-</html>
+</html> 
