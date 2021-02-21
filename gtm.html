@@ -35,6 +35,11 @@
                     var eventAction = getUrlParameter('eventAction')
                     var eventValue = 0
                     if (eventAction){
+                        $('#event').text(event)
+                        $('#eventCategory').text(eventCategory)
+                        $('#eventLabel').text(eventLabel)
+                        $('#eventAction').text(eventAction)
+                        $('#eventValue').text(eventValue)
                         window.dataLayer.push({            
                             'event': event,            
                             'eventCategory': eventCategory,            
@@ -43,6 +48,10 @@
                             'eventValue': eventValue          
                         });
                     }else{
+                        $('#event').text(event)
+                        $('#eventCategory').text(eventCategory)
+                        $('#eventLabel').text(eventLabel)
+                        $('#eventValue').text(eventValue)
                         window.dataLayer.push({            
                             'event': event,            
                             'eventCategory': eventCategory,            
@@ -63,6 +72,12 @@
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
-        Intended to track GTM events
+        <table>
+            <tr><td><b>event: </b></td><td id="event"></td></tr>
+            <tr><td><b>eventCategory: </b></td><td id="eventCategory"></td></tr>
+            <tr><td><b>eventLabel: </b></td><td id="eventLabel"></td></tr>
+            <tr><td><b>eventAction: </b></td><td id="eventAction"></td></tr>
+            <tr><td><b>eventValue: </b></td><td id="eventValue"></td></tr>
+        </table>
     </body>
 </html>
