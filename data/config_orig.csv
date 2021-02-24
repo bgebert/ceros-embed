@@ -1,0 +1,25 @@
+﻿Region;Industry;Orgsize
+North East=NE;Industry - A=IA;1 - 50=exsmall
+North East=NE;Industry - A=IA;51 - 200=small
+North East=NE;Industry - A=IA;201 - 500=med
+North East=NE;Industry - A=IA;> 500=large
+North East=NE;Industry - B=IB;51 - 200=small
+North East=NE;Industry - B=IB;201 - 500=med
+South East=SE;Industry - A=IA;201 - 500=med
+Mid West=MW;Industry - A=IA;1 - 50=exsmall
+Mid West=MW;Industry - A=IA;51 - 200=small
+Mid West=MW;Industry - A=IA;201 - 500=med
+Mid West=MW;Industry - B=IB;1 - 50=exsmall
+Mid West=MW;Industry - B=IB;51 - 200=small
+South West=SW;Industry - A=IA;51 - 200=small
+South West=SW;Industry - A=IA;> 500=large
+South West=SW;Industry - B=IB;1 - 50=exsmall
+South West=SW;Industry - B=IB;51 - 200=small
+South West=SW;Industry - B=IB;> 500=large
+South West=SW;Industry - C=IC;1 - 50=exsmall
+South West=SW;Industry - C=IC;> 500=large
+West=WE;Industry - C=IC;1 - 50=exsmall
+West=WE;Industry - C=IC;51 - 200=small
+West=WE;Industry - D=ID;1 - 50=exsmall
+West=WE;Industry - D=ID;51 - 200=small
+West=WE;Industry - D=ID;> 500=large
