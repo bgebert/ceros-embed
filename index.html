@@ -20,9 +20,10 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.min.js"></script>
-        <!--<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js"></script>-->
-        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>-->
+        <!--<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.min.js"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.debug.min.js" integrity="sha512-+9kgaOpvAGdLyaCeMWkYXt4R8m/fRgbGud4wzsJQ1cwhNYrQj+a8E3pstfc6E9zuHhbyzSiC+AHxeZ5SFVyDmQ==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.3.2/knockout.mapping.min.js" integrity="sha512-sCLnmp1UrJki3R9zwZMLXg9lXlGxJ6yFVuiSJ1pi1qRST3CJPAkJIhOHEQZz10P2gWgY3H8Y33na5Ak9PV5PLA==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" integrity="sha512-3PRVLmoBYuBDbCEojg5qdmd9UhkPiyoczSFYjnLhFb2KAFsWWEMlAPt0olX1Nv7zGhDfhGEVkXsu51a55nlYmw==" crossorigin="anonymous"></script>
         
         <script>
             var SHRM = SHRM || {};
@@ -307,19 +308,25 @@
             }
 
             function ViewModel(josnObj){
-                this.list = josnObj.list;
+                //this.list = josnObj.list;
+                this.tabledata_filtered = SHRM.utils.data.tabledata
             }
 
             function initHTML(){
-                var json  = getJson();
+                //var json  = getJson();
                 //json = '{"list":' + myjson + '}'
-                var jObj = JSON.parse(json);
+                //var jObj = JSON.parse(json);
 
                 //Creating view model for html
-                var viewModel = new ViewModel(jObj);
+                //var viewModel = new ViewModel(jObj);
 
+                var viewModel = {
+                    filtered_results: ko.observableArray()
+                }
+                SHRM.utils.pageConfig.viewModel = viewModel
+                
                 //Applying the view model to html UI
-                ko.applyBindings(viewModel); 
+                ko.applyBindings(SHRM.utils.pageConfig.viewModel); 
             }
 
             function initDefaults(filterBy, globalConfigKeys, TopLevelType = null, SubLevelType = null, selectpicker = null, categoryType = null){
@@ -344,10 +351,6 @@
                     return
                 }
                 
-                initHTML()
-                
-                $('body').removeClass('hidden')
-                
                 // Init variables
                 SHRM.utils.pageConfig = {}
                 SHRM.utils.pageConfig.filterBy = filterBy
@@ -355,6 +358,9 @@
                 SHRM.utils.pageConfig.TopLevelType = TopLevelType
                 SHRM.utils.pageConfig.SubLevelType = SubLevelType
                 SHRM.utils.pageConfig.categoryType = categoryType
+
+                initHTML()
+
                 if (categoryType){
                     SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
                 }
@@ -374,7 +380,7 @@
                         categoryType = String(arrURLparams[4])
                         SHRM.utils.pageConfig.categoryType = '#' + categoryType
                         SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
-                        localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + ".categoryType", '#' + categoryType)
+                        localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + "." + SubLevelType + ".categoryType", '#' + categoryType)
                         $('a[href$="' + categoryType + '"]').trigger('click')
                         bCallUpdateURL = false
                     }
@@ -386,18 +392,21 @@
                     }
 
                     if (localStorage.getItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + ".categoryType")) {
-                        categoryType = localStorage.getItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + ".categoryType")
+                        categoryType = localStorage.getItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + "." + SubLevelType +  ".categoryType")
                         SHRM.utils.pageConfig.categoryType = categoryType
                         SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
                         $('a[href$="' + categoryType + '"]').trigger('click')
                         bCallUpdateURL = false
                     }
                 }
+                
+                $('body').removeClass('hidden')
 
                 // No tab (categoryType) has been previously selected, so the 1st tab is loaded by default
                 // Unfortunately, 'show.bs.tab' is not triggered as expected, so we must force it
-                $('a[href$="#' + categoryType + '"]').trigger('show.bs.tab')
-                $('a[href$="#' + categoryType + '"]').trigger('shown.bs.tab')
+                $('a[href$="#' + categoryType + '"]').tab('show')
+                //$('a[href$="#' + categoryType + '"]').trigger('show.bs.tab')
+                //$('a[href$="#' + categoryType + '"]').trigger('shown.bs.tab')
                 if (bCallUpdateURL) { updateURL() }
             }
 
@@ -450,10 +459,10 @@
                 // The code below was written to see if this would work and appear in Google Analytics.
 
                 //src = 'gtm.html#/' + SHRM.utils.pageConfig.TopLevelType + '/' + SHRM.utils.pageConfig.SubLevelType + '/' + eventCategory + '/' + eventLabel
-                src = 'gtm.html?' + 'event=' + event + '&eventCategory=' + eventCategory + '&eventLabel=' + eventLabel
+                src = 'gtm.html?' + 'event=' + encodeURIComponent(event) + '&eventCategory=' + encodeURIComponent(eventCategory) + '&eventLabel=' + encodeURIComponent(eventLabel)
                 if (eventAction){
                     if (eventAction != ''){
-                        src = src + '&eventAction=' + eventAction
+                        src = src + '&eventAction=' + encodeURIComponent(eventAction)
                     }
                 }
                 $('#gtm').attr('src', src)
@@ -568,6 +577,34 @@
                     $('.responsive_iframe').attr('src', src)
                     $('.btn-export').removeClass('disabled');
 
+                    if (SHRM.utils.data.tabledata){
+                        if (SHRM.utils.pageConfig.filterBy == "by-1"){
+                            var filtered_by_category = SHRM.utils.data.tabledata.filter(a => a.eventCategory == SHRM.utils.pageConfig.categoryText);
+                            if (SHRM.utils.pageConfig.selectpicker_1){
+                                filtered_by = filtered_by_category.filter(a => a.eventLabel == SHRM.utils.pageConfig.selectpicker_1);
+                            }else{
+                                filtered_by = filtered_by_category.filter(a => a.eventLabel == 'all');
+                            }
+                            //SHRM.utils.data.tabledata_filtered = filtered_by
+                        }
+                        
+                        ko.mapping.fromJSON(JSON.stringify(filtered_by), {}, SHRM.utils.pageConfig.viewModel.filtered_results);
+                    }
+
+                    $('.inlinesparkline').each(function () {
+                        myvalues = JSON.parse("[" + $(this).attr('myvalues') + "]")
+                        $(this).sparkline(myvalues, {width: '60', height: '20'} );
+                    });
+
+                    $('.indicator').each(function () {
+                        value = JSON.parse("[" + $(this).attr('myindicator') + "]")
+                        if (value == 2) {$(this).addClass("fas fa-arrow-up indicator_significant_up");}
+                        if (value == 1) {$(this).addClass("fas fa-arrow-up indicator_not_significant");}
+                        if (value == 0) {$(this).addClass("fas fa-arrows-alt-h indicator_not_significant");}
+                        if (value == -1) {$(this).addClass("fas fa-arrow-down indicator_not_significant");}
+                        if (value == -2) {$(this).addClass("fas fa-arrow-down indicator_significant_down");}
+                    });
+
                     console.log('on click: ' + src);
                 });
 
@@ -578,9 +615,12 @@
                         url = arrHREF[1]
                         var obj = $('#' + url)
                         SHRM.utils.pageConfig.categoryType = '#' + url
-                        localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + ".categoryType", '#' + url)
-                        $('.navpicker option[value=' + $(event.target).attr('id') + ']').attr('selected','selected')
-                        $('.navpicker').trigger('change')
+                        localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + "." + SHRM.utils.pageConfig.SubLevelType + ".categoryType", '#' + url)
+                        //$('.navpicker option[value=' + $(event.target).attr('id') + ']').attr('selected','selected')
+                        //$('.navpicker option[value=' + SHRM.utils.pageConfig.categoryType + ']').attr('selected','selected')
+                        $(".navpicker option[value='" + SHRM.utils.pageConfig.categoryType.replace('#','') + "']").prop("selected", true);
+                        //$('.navpicker').trigger('change')
+                        $('.navpicker').find('.filter-option-inner-inner').text($(event.target).text())
                     }
                     
                     if (obj) {     //if ((obj) && (obj.is(':visible'))){
@@ -874,7 +914,7 @@
                 SHRM.utils.healthcare = [
                     {
                         "name": "General Health",
-                        "data-val-file-prefix": "./data/Health/GenHealth",
+                        "data-val-file-prefix": "./data/GenHealth/GenHealth",
                         "id": "drilldown-tab1",
                         "data-val-filterby": "by-1",
                         "data-val-config-keys": "['region','industry','orgsize']",
@@ -882,7 +922,7 @@
                     },
                     {
                         "name": "HSA & FSA",
-                        "data-val-file-prefix": "./data/Health/HealthSavings",
+                        "data-val-file-prefix": "./data/HealthSavings/HealthSavings",
                         "id": "drilldown-tab2",
                         "data-val-filterby": "by-1",
                         "data-val-config-keys": "['region','industry','orgsize']",
@@ -890,7 +930,7 @@
                     },
                     {
                         "name": "Prescription Drug",
-                        "data-val-file-prefix": "./data/Health/PrescriptionDrugs",
+                        "data-val-file-prefix": "./data/PrescriptionDrugs/PrescriptionDrugs",
                         "id": "drilldown-tab3",
                         "data-val-filterby": "by-1",
                         "data-val-config-keys": "['region','industry','orgsize']",
@@ -898,7 +938,7 @@
                     },
                     {
                         "name": "Supplemental Health Ins.",
-                        "data-val-file-prefix": "./data/Health/Dental_Vision",
+                        "data-val-file-prefix": "./data/Dental_Vision/Dental_Vision",
                         "id": "drilldown-tab4",
                         "data-val-filterby": "by-1",
                         "data-val-config-keys": "['region','industry','orgsize']",
@@ -906,7 +946,7 @@
                     },
                     {
                         "name": "Disability & Accident Ins.",
-                        "data-val-file-prefix": "./data/Health/DisabilityAccident",
+                        "data-val-file-prefix": "./data/DisabilityAccident/DisabilityAccident",
                         "id": "drilldown-tab5",
                         "data-val-filterby": "by-1",
                         "data-val-config-keys": "['region','industry','orgsize']",
@@ -914,19 +954,142 @@
                     },
                     {
                         "name": "Coverage for Specific Health Services",
-                        "data-val-file-prefix": "./data/Health/Specific_Services",
+                        "data-val-file-prefix": "./data/Specific_Services/Specific_Services",
                         "id": "drilldown-tab6",
                         "data-val-filterby": "by-1",
                         "data-val-config-keys": "['region','industry','orgsize']",
                         "data-val-config-path": "./data/config.csv"
                     }
                 ]
-                //SHRM.utils.retirement = []
-                //SHRM.utils.leave = []
-                //SHRM.utils.family = []
-                //SHRM.utils.flexibility = []
-                //SHRM.utils.profdev = []
-                //SHRM.utils.convid19 = []
+                SHRM.utils.retirement = [
+                    {
+                        "name": "Retirement",
+                        "data-val-file-prefix": "./data/Financial_Retirement/Financial_Retirement",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    },
+                    {
+                        "name": "DCRSP",
+                        "data-val-file-prefix": "./data/Financial_DCRSP/Financial_DCRSP",
+                        "id": "drilldown-tab2",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    },
+                    {
+                        "name": "Education",
+                        "data-val-file-prefix": "./data/Financial_Education/Financial_Education",
+                        "id": "drilldown-tab3",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    },
+                    {
+                        "name": "Other",
+                        "data-val-file-prefix": "./data/Financial_Other/Financial_Other",
+                        "id": "drilldown-tab4",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    }
+                ]
+                SHRM.utils.leave = [
+                    {
+                        "name": "Vacation & Sick",
+                        "data-val-file-prefix": "./data/Leave_Vacay_Sick/Leave_Vacay_Sick",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    },
+                    {
+                        "name": "Parental",
+                        "data-val-file-prefix": "./data/Leave_Parental/Leave_Parental",
+                        "id": "drilldown-tab2",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    },
+                    {
+                        "name": "Family",
+                        "data-val-file-prefix": "./data/Leave_Family/Leave_Family",
+                        "id": "drilldown-tab3",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    },
+                    {
+                        "name": "Other",
+                        "data-val-file-prefix": "./data/Leave_Other/Leave_Other",
+                        "id": "drilldown-tab4",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    }
+                ]
+                SHRM.utils.flexibility = [
+                    {
+                        "name": "Flex Work",
+                        "data-val-file-prefix": "./data/Flexible_Work/Flexible_Work",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    }
+                ]
+                SHRM.utils.family = [
+                    {
+                        "name": "Family Friendly",
+                        "data-val-file-prefix": "./data/Family_Friendly/Family_Friendly",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    }
+                ]
+                SHRM.utils.profdev = [
+                    {
+                        "name": "Professional Development",
+                        "data-val-file-prefix": "./data/Prof_Development/Prof_Development",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    }
+                ]
+                SHRM.utils.wellness = [
+                    {
+                        "name": "Wellness",
+                        "data-val-file-prefix": "./data/Wellness/Wellness",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "data-val-config-keys": "['region','industry','orgsize']",
+                        "data-val-config-path": "./data/config.csv"
+                    }
+                ]
+
+                SHRM.utils.data = {}
+                SHRM.utils.data.tableheader = [
+                    {"c1":"Type of Plan","c2":"2016","c3":"2017","c4":"2018","c5":"2019","c6":"2020","c7":"1 year change","c8":"","c9":""}
+                ]
+                SHRM.utils.data.tabledata = [
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"2","sparkline_data":"84,85,84,86,79"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Health maintenance organization (HMO)", "y1":"32%","y2":"34%","y3":"35%","y4":"34%","y5":"34%","delta":"0%","indicator":"0","sparkline_data":"32,34,35,34,34"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"High-deductible health plan (HDHP) that is linked with a savings/spending account", "y1":"--","y2":"--","y3":"--","y4":"61%","y5":"59%","delta":"-2%","indicator":"-1","sparkline_data":"61,59"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"High-deductible health plan (HDHP) that is NOT linked with a savings/spending account", "y1":"17%","y2":"19%","y3":"29%","y4":"19%","y5":"16%","delta":"-3%","indicator":"-2","sparkline_data":"17,19,29,19,16"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Point of service (POS)", "y1":"21%","y2":"21%","y3":"17%","y4":"19%","y5":"13%","delta":"-6%","indicator":"-2","sparkline_data":"21,21,17,19,13"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Exclusive provider organization (EPO)", "y1":"9%","y2":"9%","y3":"7%","y4":"9%","y5":"9%","delta":"0%","indicator":"0","sparkline_data":"9,9,7,9,9"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Indemnity plan (fee-for-service)", "y1":"7%","y2":"8%","y3":"4%","y4":"6%","y5":"4%","delta":"-2%","indicator":"-2","sparkline_data":"7,8,4,6,4"},
+                    {"eventCategory":"General Health","eventLabel":"NE","plan_type":"Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"2","sparkline_data":"84,85,84,86,79"},
+                    {"eventCategory":"General Health","eventLabel":"NE","plan_type":"Health maintenance organization (HMO)", "y1":"32%","y2":"34%","y3":"35%","y4":"34%","y5":"34%","delta":"0%","indicator":"0","sparkline_data":"32,34,35,34,34"},
+                    {"eventCategory":"General Health","eventLabel":"S","plan_type":"High-deductible health plan (HDHP) that is linked with a savings/spending account", "y1":"--","y2":"--","y3":"--","y4":"61%","y5":"59%","delta":"-2%","indicator":"-1","sparkline_data":"61,59"},
+                    {"eventCategory":"General Health","eventLabel":"S","plan_type":"High-deductible health plan (HDHP) that is NOT linked with a savings/spending account", "y1":"17%","y2":"19%","y3":"29%","y4":"19%","y5":"16%","delta":"-3%","indicator":"-2","sparkline_data":"17,19,29,19,16"},
+                    {"eventCategory":"General Health","eventLabel":"S","plan_type":"Point of service (POS)", "y1":"21%","y2":"21%","y3":"17%","y4":"19%","y5":"13%","delta":"-6%","indicator":"-2","sparkline_data":"21,21,17,19,13"},
+                    {"eventCategory":"General Health","eventLabel":"W","plan_type":"Exclusive provider organization (EPO)", "y1":"9%","y2":"9%","y3":"7%","y4":"9%","y5":"9%","delta":"0%","indicator":"0","sparkline_data":"9,9,7,9,9"},
+                    {"eventCategory":"General Health","eventLabel":"W","plan_type":"Indemnity plan (fee-for-service)", "y1":"7%","y2":"8%","y3":"4%","y4":"6%","y5":"4%","delta":"-2%","indicator":"-2","sparkline_data":"7,8,4,6,4"}
+                ]
 
                 initDefaults('by-1', ['region','industry','orgsize'])   // ('by-1', ['region','industry','orgsize'], 'benefitsPortal', 'healthcare', null, 'drilldown-tab1')
                 
@@ -938,6 +1101,45 @@
             body {
                 font-family: 'Montserrat', sans-serif;
                 font-weight: 400;
+            }
+
+            .indicator_significant_down { color: #BD2A96 }
+            .indicator_significant_up { color: #7AB022 }
+            .indicator_not_significant { color: #D3D3D3 }
+
+            .research_findings {
+                width: 100%;
+                max-width: 100%;
+                margin-bottom: 20px;
+                padding-left: 25px;
+                padding-right: 25px;
+                font-size: 14px;
+                font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            }
+
+            .research_findings>tbody>tr>td{
+                line-height: 1.42857143;
+                vertical-align: top;
+                border-top: 1px solid #ddd;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+            
+            .research_findings>thead>tr>th {
+                padding:5px;
+                font-size: 14px;
+                font-weight: bold;
+                vertical-align: bottom;
+                border-bottom: 2px solid #ddd;
+                line-height: 1.42857143;
+                width: 60px
+            }
+
+            .inlinesparkline {
+                width: 60;
+                height: 20;
             }
 
             .table {
@@ -1070,7 +1272,7 @@
                         <option value="" data-val="all">All Orgs</option>
                     </select>
                     -->
-                    <div class="col-md-3" style="display:inline-block">
+                    <div class="col-md-4" style="display:inline-block">
                         <button type="button" class="btn btn-primary btn-sm btn-filter hidden"><span class="fas fa-filter" aria-hidden="true"></span> Filter </button>
                         <button id="spinner" class="btn btn-primary hidden" type="button" style="font-size:14px;width: 92.08px;" disabled>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -1090,10 +1292,32 @@
                 <div>
                     <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                 </div>
+                <div class="hidden" style="width:100%;padding:25px">
+                    <table class="research_findings">
+                        <thead data-bind="foreach: SHRM.utils.data.tableheader">
+                            <tr>
+                                <th style="padding:5px;font-size: 14px;width:100%" data-bind="text: c1"></th>
+                                <th data-bind="text: c2"></th><th data-bind="text: c3"></th><th data-bind="text: c4"></th><th data-bind="text: c5"></th><th data-bind="text: c6"></th><th data-bind="text: c7" colspan="2"></th><th data-bind="text: c8"></th></th></tr>
+                        </thead>
+                        <tbody data-bind="foreach: filtered_results">
+                            <tr>
+                                <td style="text-align: left;"><span data-bind="text: plan_type" style="color: grey; font-weight: bold"></span></td>
+                                <td style="text-align: right; width:60px" data-bind="text: y1"></td>
+                                <td style="text-align: right;" data-bind="text: y2"></td>
+                                <td style="text-align: right;" data-bind="text: y3"></td>
+                                <td style="text-align: right;" data-bind="text: y4"></td>
+                                <td style="text-align: right;" data-bind="text: y5"></td>
+                                <td style="text-align: center"><span data-bind="text: delta" style="padding-right:10px"></span></td>
+                                <td style="text-align: center"><span style="width:14px;vertical-align: top;text-align: center;" class="indicator" data-bind="attr: { myindicator: indicator }"></span></td>
+                                <td style="text-align: right;"><div class="inlinesparkline" data-bind="attr: {myvalues: sparkline_data}"></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <span class="drilldown_footer">Chart: &#169; 2020 Society for Human Resource Management &middot; Source: Employee Benefits 2020</span>
         </div>
-        <iframe id="gtm" src="about:blank" ostyle="display:none" oclass='hidden'></iframe>
+        <iframe id="gtm" src="about:blank" ostyle="display:none" class='hidden'></iframe>
         <div class='drilldown_image' ostyle="max-width: 1000px" style="max-width: 1000px;z-index:-1000;top:0px;left:-25999px;position:absolute"></div>
     </body>
 </html> 
