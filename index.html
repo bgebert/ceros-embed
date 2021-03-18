@@ -466,7 +466,6 @@
 
                 //src = 'gtm.html#/' + SHRM.utils.pageConfig.TopLevelType + '/' + SHRM.utils.pageConfig.SubLevelType + '/' + eventCategory + '/' + eventLabel
                 src = 'gtm.html?' + 'event=' + encodeURIComponent(event) + '&eventCategory=' + encodeURIComponent(eventCategory) + '&eventLabel=' + encodeURIComponent(eventLabel)
-                alert(src)
                 if (eventAction){
                     if (eventAction != ''){
                         src = src + '&eventAction=' + encodeURIComponent(eventAction)
