@@ -20,7 +20,6 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-        <!--<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.min.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.debug.min.js" integrity="sha512-+9kgaOpvAGdLyaCeMWkYXt4R8m/fRgbGud4wzsJQ1cwhNYrQj+a8E3pstfc6E9zuHhbyzSiC+AHxeZ5SFVyDmQ==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.3.2/knockout.mapping.min.js" integrity="sha512-sCLnmp1UrJki3R9zwZMLXg9lXlGxJ6yFVuiSJ1pi1qRST3CJPAkJIhOHEQZz10P2gWgY3H8Y33na5Ak9PV5PLA==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" integrity="sha512-3PRVLmoBYuBDbCEojg5qdmd9UhkPiyoczSFYjnLhFb2KAFsWWEMlAPt0olX1Nv7zGhDfhGEVkXsu51a55nlYmw==" crossorigin="anonymous"></script>
@@ -436,14 +435,21 @@
 
             function pushToGTM(){
                 if (window.dataLayer){
-                    var event = SHRM.utils.pageConfig.TopLevelType + " | " + SHRM.utils.pageConfig.SubLevelType
-                    var eventCategory = SHRM.utils.pageConfig.categoryText
-                    var eventLabel = (SHRM.utils.pageConfig.selectpicker_1) ? SHRM.utils.pageConfig.selectpicker_1 : 'all'
-                    var eventAction = SHRM.utils.pageConfig.exportType
-                    var eventValue = 0
+                    // The values i mapped to below were wrong, i had to remap them.  See the second set for the correct way.
+                    //var event = SHRM.utils.pageConfig.TopLevelType + " | " + SHRM.utils.pageConfig.SubLevelType
+                    //var eventCategory = SHRM.utils.pageConfig.categoryText
+                    //var eventLabel = (SHRM.utils.pageConfig.selectpicker_1) ? SHRM.utils.pageConfig.selectpicker_1 : 'all'
+                    //var eventAction = SHRM.utils.pageConfig.exportType
+                    //var eventValue = 0
                     
-                    console.log('pushToGTM:\nevent=' + event + ';\neventCategory=' + eventCategory + ';\neventLabel=' + eventLabel + ';\neventAction=' + eventAction)
-                    
+                    var event = 'GAEvent'
+                    var eventCategory = SHRM.utils.pageConfig.TopLevelType + " | " + SHRM.utils.pageConfig.SubLevelType
+                    var eventLabel = SHRM.utils.pageConfig.categoryText
+                    var eventAction = (SHRM.utils.pageConfig.selectpicker_1) ? SHRM.utils.pageConfig.selectpicker_1 : 'all'
+                    var eventValue = SHRM.utils.pageConfig.exportType
+                    //debugger
+                    console.log('pushToGTM:\nevent=' + event + ';\neventCategory=' + eventCategory + ';\neventLabel=' + eventLabel + ';\neventAction=' + eventAction + ';\neventValue=' + eventValue)
+                    //debugger
                     window.dataLayer.push({            
                         'event': event,            
                         'eventCategory': eventCategory,            
@@ -460,6 +466,7 @@
 
                 //src = 'gtm.html#/' + SHRM.utils.pageConfig.TopLevelType + '/' + SHRM.utils.pageConfig.SubLevelType + '/' + eventCategory + '/' + eventLabel
                 src = 'gtm.html?' + 'event=' + encodeURIComponent(event) + '&eventCategory=' + encodeURIComponent(eventCategory) + '&eventLabel=' + encodeURIComponent(eventLabel)
+                alert(src)
                 if (eventAction){
                     if (eventAction != ''){
                         src = src + '&eventAction=' + encodeURIComponent(eventAction)
@@ -585,7 +592,7 @@
                             }else{
                                 filtered_by = filtered_by_category.filter(a => a.eventLabel == 'all');
                             }
-                            //SHRM.utils.data.tabledata_filtered = filtered_by
+                            SHRM.utils.data.tabledata_filtered = filtered_by
                         }
                         
                         ko.mapping.fromJSON(JSON.stringify(filtered_by), {}, SHRM.utils.pageConfig.viewModel.filtered_results);
@@ -643,6 +650,12 @@
                     SHRM.utils.pageConfig.categoryType = $( event.target ).attr('href')
                     id = $( event.target ).attr('href')
                     initDrillDown($(id));
+                    if ($('.selectpicker-1').hasClass('selectpicker')){
+                        // This is being done because of a timing issue that caused the drop down to not display properly
+                        // Basically, it wasn't fully loaded before the styling was finished
+                    }else{
+                        $('.selectpicker-1').addClass('selectpicker')
+                    }
                 });
                 
                 $('.selectpicker-1').on('change', function (event) {
@@ -668,7 +681,6 @@
                         };
                     }
                     
-
                     $('.btn-export').addClass('disabled')
 
                     SHRM.utils.pageConfig.selectpicker_1 = $( event.target ).val()
@@ -1257,7 +1269,7 @@
                 </div>
                 
                 <div class="nav_layer3">
-                    <select class="col-md-4 selectpicker selectpicker-1" data-size="9" tabindex="-98">
+                    <select class="col-md-4 selectpicker-1" data-size="9" tabindex="-98">
                         <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                     </select>
                     <!-- The following block of HTML should be kept, so we can enable it later if needed -->
@@ -1292,7 +1304,8 @@
                 <div>
                     <iframe class="responsive_iframe" src="about:blank" allowtransparency="true" frameborder="0" onerror=="alert('error')"></iframe>
                 </div>
-                <div class="hidden" style="width:100%;padding:25px">
+                <!--
+                <div oclass="hidden" style="width:100%;padding:25px">
                     <table class="research_findings">
                         <thead data-bind="foreach: SHRM.utils.data.tableheader">
                             <tr>
@@ -1314,6 +1327,7 @@
                         </tbody>
                     </table>
                 </div>
+                -->
             </div>
             <span class="drilldown_footer">Chart: &#169; 2020 Society for Human Resource Management &middot; Source: Employee Benefits 2020</span>
         </div>

@@ -28,12 +28,13 @@
             };
 
             function pushToGTM(){
+                debugger
                 if (window.dataLayer){
                     var event = getUrlParameter('event')
                     var eventCategory = getUrlParameter('eventCategory')
                     var eventLabel = getUrlParameter('eventLabel')
                     var eventAction = getUrlParameter('eventAction')
-                    var eventValue = 0
+                    var eventValue = getUrlParameter('eventValue')
                     if (eventAction){
                         $('#event').text(event)
                         $('#eventCategory').text(eventCategory)
