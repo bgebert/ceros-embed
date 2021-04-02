@@ -904,6 +904,28 @@
                     {"region_keyval":"South=S","region":"S","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
                     {"region_keyval":"West=W","region":"W","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
                     {"region_keyval":"","region":"","industry_keyval":"Construction=CONSTR","industry":"CONSTR","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Financial Activities=FINANCE","industry":"FINANCE","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Government & Education=GOVTEDU","industry":"GOVTEDU","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Healthcare and Social Assistance=HLTHSS","industry":"HLTHSS","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Leisure & Hospitality=LSHOSP","industry":"LSHOSP","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Manufacturing=MANFCT","industry":"MANFCT","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Other=OTHER","industry":"OTHER","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Other Services=OTHSERV","industry":"OTHSERV","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Professional & Business Services=PROFBUS","industry":"PROFBUS","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Retail, Wholesale, Transport, Utilities=R_W_T_U","industry":"R_W_T_U","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"1-99=SM","orgsize":"SM"},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"100-499=MD","orgsize":"MD"},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"500-4999=LG","orgsize":"LG"},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"5000+=XL","orgsize":"XL"}
+                ]
+
+                /*
+                SHRM.utils.dataObj = [
+                    {"region_keyval":"Midwest=M","region":"M","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"Northeast=NE","region":"NE","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"South=S","region":"S","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"West=W","region":"W","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Construction=CONSTR","industry":"CONSTR","orgsize_keyval":"","orgsize":""},
                     {"region_keyval":"","region":"","industry_keyval":"Education & Health Services=EDUHLTH","industry":"EDUHLTH","orgsize_keyval":"","orgsize":""},
                     {"region_keyval":"","region":"","industry_keyval":"Financial Activities=FINANCE","industry":"FINANCE","orgsize_keyval":"","orgsize":""},
                     {"region_keyval":"","region":"","industry_keyval":"Government=GOVT","industry":"GOVT","orgsize_keyval":"","orgsize":""},
@@ -918,6 +940,7 @@
                     {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"500-4999=LG","orgsize":"LG"},
                     {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"5000+=XL","orgsize":"XL"}
                 ]
+                */
 
                 // In the arrays below, if "data-val-filterby" = "by-1" then, region, industry and orgsize are in 1 dropdown
                 // if you want the ability to only show the industries (or orgsize) based off selected region,
@@ -1211,6 +1234,10 @@
 
             .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {color: #000000; font-weight: 500;}
 
+            .nav-tabs .nav-link {margin-top: 10px;}
+
+            .bootstrap-select {margin-top: 5px;}
+
             @media screen and (max-width: 1275px) {
                 .nav_layer1{ display: contents; }
                 .nav_layer2{ display: none; }
@@ -1237,6 +1264,7 @@
                 @supports (-webkit-appearance:none) {
                     .bootstrap-select {
                         height: 35px;
+                        margin-bottom: 15px;
                     }
                 }
             }
