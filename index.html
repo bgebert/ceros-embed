@@ -375,8 +375,14 @@
                         SHRM.utils.pageConfig.selectpicker_1 = selectpicker
                         localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + ".selectpicker_1", selectpicker)
                     }
+                    
                     if (String(arrURLparams[4]) != '') { 
-                        categoryType = String(arrURLparams[4])
+                        expected_tab = String(arrURLparams[4])
+                        if (parseInt(expected_tab[expected_tab.length -1]) > SHRM.utils[SubLevelType].length) {
+                            categoryType = expected_tab.replace(expected_tab[expected_tab.length -1], '1')
+                        }else{
+                            categoryType = String(arrURLparams[4])
+                        }
                         SHRM.utils.pageConfig.categoryType = '#' + categoryType
                         SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
                         localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + "." + SubLevelType + ".categoryType", '#' + categoryType)
