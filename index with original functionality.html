@@ -23,8 +23,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.debug.min.js" integrity="sha512-+9kgaOpvAGdLyaCeMWkYXt4R8m/fRgbGud4wzsJQ1cwhNYrQj+a8E3pstfc6E9zuHhbyzSiC+AHxeZ5SFVyDmQ==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.3.2/knockout.mapping.min.js" integrity="sha512-sCLnmp1UrJki3R9zwZMLXg9lXlGxJ6yFVuiSJ1pi1qRST3CJPAkJIhOHEQZz10P2gWgY3H8Y33na5Ak9PV5PLA==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" integrity="sha512-3PRVLmoBYuBDbCEojg5qdmd9UhkPiyoczSFYjnLhFb2KAFsWWEMlAPt0olX1Nv7zGhDfhGEVkXsu51a55nlYmw==" crossorigin="anonymous"></script>
-        <script src="calculated_merged.json"></script>
-
+        
         <script>
             var SHRM = SHRM || {};
             SHRM.utils = {};
@@ -79,11 +78,9 @@
                     for (var item, i = 0; item = dataObj[i++];) {
                         var value = eval('item.' + key);
 
-                        if (value) {
-                            if (!(value in lookup)) {
-                                lookup[value] = 1;
-                                result.push(value);
-                            }
+                        if (!(value in lookup)) {
+                            lookup[value] = 1;
+                            result.push(value);
                         }
                     }
 
@@ -252,7 +249,7 @@
         
             }).apply(SHRM.utils);
 
-            function remove_initDrillDown(objContainter){
+            function initDrillDown(objContainter){
                 if (SHRM.utils.selectPickersLoaded === undefined){
                     var configKeys = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-config-keys"]
                     var configPath = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-config-path"]
@@ -263,22 +260,15 @@
                     }else{
                         arrConfigKeys = SHRM.utils.pageConfig.configKeys
                     }
-                    
-                    if (!(filterBy)) {
-                        filterBy = SHRM.utils.pageConfig.filterBy
-                    }
 
                     var dataObj = null
-                    if ((objContainter) && (arrConfigKeys.length)){
+                    if ((objContainter) && (arrConfigKeys.length == 3)){
                         if (SHRM.utils.dataObj){
                             dataObj = SHRM.utils.dataObj
                             if (filterBy == 'by-1'){
-                                arrConfigKeys.forEach(function (configKey, index) {
-                                    SHRM.utils.configureDropDowns(dataObj, configKey + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(configKey))
-                                });
-                                //SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[0]))
-                                //SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[1]))
-                                //SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[2] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[2]))
+                                SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[0]))
+                                SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[1]))
+                                SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[2] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[2]))
                             }else{
                                 SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', $('.selectpicker-1'))
                                 SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', $('.selectpicker-2'))
@@ -292,12 +282,9 @@
                                     dataObj = SHRM.utils.convertCSVtoJSON(response, arrConfigKeys)
                                     
                                     if (filterBy == 'by-1'){
-                                        arrConfigKeys.forEach(function (configKey, index) {
-                                            SHRM.utils.configureDropDowns(dataObj, configKey + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(configKey))
-                                        });
-                                        //SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[0]))
-                                        //SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[1]))
-                                        //SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[2] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[2]))
+                                        SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[0]))
+                                        SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[1]))
+                                        SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[2] + '_keyval', $('.selectpicker-1'), SHRM.utils.capitalize(arrConfigKeys[2]))
                                     }else{
                                         SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[0] + '_keyval', $('.selectpicker-1'))
                                         SHRM.utils.configureDropDowns(dataObj, arrConfigKeys[1] + '_keyval', $('.selectpicker-2'))
@@ -345,7 +332,6 @@
             }
 
             function initDefaults(filterBy, globalConfigKeys, TopLevelType = null, SubLevelType = null, selectpicker = null, categoryType = null){
-                //debugger
                 var bCallUpdateURL = true
                 var arrURLparams = window.location.hash.split('/')
                 
@@ -355,7 +341,6 @@
                     if (String(arrURLparams[1]) != '') { TopLevelType = String(arrURLparams[1])}
                     if (String(arrURLparams[2]) != '') { SubLevelType = String(arrURLparams[2])}
                 }
-                //debugger
                 if(SubLevelType){
                     if (SHRM.utils[SubLevelType]){
                         SHRM.utils.tabs = SHRM.utils[SubLevelType]
@@ -380,7 +365,6 @@
 
                 if (categoryType){
                     SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
-                    SHRM.utils.pageConfig.categoryCode = $('a[href$="' + categoryType + '"]').attr('categoryCode')
                 }
                 SHRM.utils.pageConfig.selectpicker_1 = selectpicker
                 SHRM.utils.pageConfig.exportType = ''
@@ -404,7 +388,6 @@
                         }
                         SHRM.utils.pageConfig.categoryType = '#' + categoryType
                         SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
-                        SHRM.utils.pageConfig.categoryCode = $('a[href$="' + categoryType + '"]').attr('categoryCode')
                         localStorage.setItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + "." + SubLevelType + ".categoryType", '#' + categoryType)
                         $('a[href$="' + categoryType + '"]').trigger('click')
                         bCallUpdateURL = false
@@ -420,7 +403,6 @@
                         categoryType = localStorage.getItem("SHRM.utils." + SHRM.utils.pageConfig.TopLevelType + "." + SubLevelType +  ".categoryType")
                         SHRM.utils.pageConfig.categoryType = categoryType
                         SHRM.utils.pageConfig.categoryText = $('a[href$="' + categoryType + '"]').text()
-                        SHRM.utils.pageConfig.categoryCode = $('a[href$="' + categoryType + '"]').attr('categoryCode')
                         $('a[href$="' + categoryType + '"]').trigger('click')
                         bCallUpdateURL = false
                     }
@@ -474,11 +456,6 @@
                     var eventLabel = SHRM.utils.pageConfig.categoryText
                     var eventAction = (SHRM.utils.pageConfig.selectpicker_1) ? SHRM.utils.pageConfig.selectpicker_1 : 'all'
                     var eventValue = SHRM.utils.pageConfig.exportType
-
-                    if (!(eventValue)) {
-                        eventValue = ''
-                    }
-
                     //debugger
                     console.log('pushToGTM:\nevent=' + event + ';\neventCategory=' + eventCategory + ';\neventLabel=' + eventLabel + ';\neventAction=' + eventAction + ';\neventValue=' + eventValue)
                     //debugger
@@ -586,11 +563,8 @@
 
                 $('.btn-filter').on('click', function (event){
                     //debugger
-                    //var filterBy = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-filterby"]
-                    var filterBy = SHRM.utils.tabs.find(tab => tab.id === SHRM.utils.pageConfig.categoryType.replace('#',''))["data-val-filterby"]
-                    var src = ''
-                    /*
                     var src = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-file-prefix"] + '-'
+                    var filterBy = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-filterby"]
                     var configKeys = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-config-keys"]
 
                     if (filterBy == 'by-1'){
@@ -617,18 +591,12 @@
                     }
                     
                     $('.responsive_iframe').attr('src', src)
-                    */
                     $('.btn-export').removeClass('disabled');
-                    
-                    if (json_tabledata){
-                        if (!(SHRM.utils.data.tabledata)){
-                            SHRM.utils.data.tabledata = json_tabledata
-                        }
-                    }
 
                     if (SHRM.utils.data.tabledata){
                         if (SHRM.utils.pageConfig.filterBy == "by-1"){
-                            var filtered_by_category = SHRM.utils.data.tabledata.filter(a => a.eventCategory == SHRM.utils.pageConfig.categoryCode);
+                            //debugger
+                            var filtered_by_category = SHRM.utils.data.tabledata.filter(a => a.eventCategory == SHRM.utils.pageConfig.categoryText);
                             if (SHRM.utils.pageConfig.selectpicker_1){
                                 filtered_by = filtered_by_category.filter(a => a.eventLabel == SHRM.utils.pageConfig.selectpicker_1);
                             }else{
@@ -653,13 +621,6 @@
                         if (value == -1) {$(this).addClass("fas fa-arrow-down indicator_not_significant");}
                         if (value == -2) {$(this).addClass("fas fa-arrow-down indicator_significant_down");}
                     });
-                    
-                    $(".toggle").removeClass("hidden")
-                    if ($('.selectpicker-1 option:selected').parent().attr('label')){
-                        if ($('.selectpicker-1 option:selected').parent().attr('label') == 'States') {
-                            $(".toggle").addClass("hidden")
-                        }
-                    }
 
                     console.log('on click: ' + src);
                 });
@@ -697,10 +658,9 @@
 
                 $(document).on('show.bs.tab', function (event) {
                     SHRM.utils.pageConfig.categoryText = $( event.target ).text()
-                    SHRM.utils.pageConfig.categoryCode = $( event.target ).attr('categoryCode')
                     SHRM.utils.pageConfig.categoryType = $( event.target ).attr('href')
                     id = $( event.target ).attr('href')
-                    //initDrillDown($(id));
+                    initDrillDown($(id));
                     if ($('.selectpicker-1').hasClass('selectpicker')){
                         // This is being done because of a timing issue that caused the drop down to not display properly
                         // Basically, it wasn't fully loaded before the styling was finished
@@ -711,7 +671,7 @@
                 
                 $('.selectpicker-1').on('change', function (event) {
                     //var objContainter = $( event.target ).closest('.tab-pane');
-                    //debugger
+
                     var filterBy = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-filterby"]
                     var configKeys = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-config-keys"]
                     
@@ -793,9 +753,7 @@
                     $('.research_findings').find('thead th').each(function() {
                         title = $(this).text().trim()
                         if (title.length > 0) {
-                            if (!($(this).hasClass('hidden'))) {
-                                titles.push(title);
-                            }
+                        titles.push(title);
                         }
                     });    
                     
@@ -807,15 +765,11 @@
                         //}
                         colCount = 0
                         $( obj ).find('td').each(function(){
-                            //if (colCount < maxCols) {
-                                //debugger
-                                if (!($(this).hasClass('hidden'))) {
-                                    content = $(this).text().trim();
-                                    data.push('"' + content + '"');
-                                    colCount += 1
-                                }
-                            //}
-                            
+                            if (colCount < maxCols) {
+                                content = $(this).text().trim();
+                                data.push(content);
+                            }
+                            colCount += 1
                         });
                     });
 
@@ -949,7 +903,27 @@
                     $( event.target ).attr('href', '#')
                 } );
 
-                SHRM.utils.dataObj = []
+                SHRM.utils.dataObj = [
+                    {"region_keyval":"Midwest=Midwest","o_region":"M","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"Northeast=Northeast","o_region":"NE","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"South=South","o_region":"S","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"West=West","o_region":"W","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Construction=CONSTR","industry":"CONSTR","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Financial Activities=FINANCE","industry":"FINANCE","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Government & Education=GOVTEDU","industry":"GOVTEDU","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Healthcare and Social Assistance=HLTHSS","industry":"HLTHSS","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Leisure & Hospitality=LSHOSP","industry":"LSHOSP","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Manufacturing=MANFCT","industry":"MANFCT","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Other=OTHER","industry":"OTHER","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Other Services=OTHSERV","industry":"OTHSERV","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Professional & Business Services=PROFBUS","industry":"PROFBUS","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"Retail, Wholesale, Transport, Utilities=R_W_T_U","industry":"R_W_T_U","orgsize_keyval":"","orgsize":""},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"1-99=SM","orgsize":"SM"},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"100-499=MD","orgsize":"MD"},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"500-4999=LG","orgsize":"LG"},
+                    {"region_keyval":"","region":"","industry_keyval":"","industry":"","orgsize_keyval":"5000+=XL","orgsize":"XL"}
+                ]
+
                 /*
                 SHRM.utils.dataObj = [
                     {"region_keyval":"Midwest=M","region":"M","industry_keyval":"","industry":"","orgsize_keyval":"","orgsize":""},
@@ -976,124 +950,170 @@
                 // In the arrays below, if "data-val-filterby" = "by-1" then, region, industry and orgsize are in 1 dropdown
                 // if you want the ability to only show the industries (or orgsize) based off selected region,
                 // then change the value to "by-3" or "by-all".  Try both to understand how they work.
-                SHRM.utils.example = [
-                    {
-                        "name": "Tab Text",
-                        "eventCategory": "Tab_Text",
-                        "id": "drilldown-tab1",
-                        "data-val-file-prefix": "./data/GenHealth/GenHealth",
-                        "data-val-filterby": "by-1",
-                        "data-val-config-keys": "['region','industry','orgsize']",
-                        "data-val-config-path": "./data/config.csv"
-                    }
-                ]
                 SHRM.utils.healthcare = [
                     {
                         "name": "General Health",
-                        "eventCategory": "GenHealth",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/GenHealth/GenHealth",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "HSA & FSA",
-                        "eventCategory": "HealthSavings",
-                        "id": "drilldown-tab2"
+                        "ajax_request_only_data-val-file-prefix": "./data/HealthSavings/HealthSavings",
+                        "id": "drilldown-tab2",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Prescription Drug",
-                        "eventCategory": "PrescriptionDrugPlan",
-                        "id": "drilldown-tab3"
+                        "ajax_request_only_data-val-file-prefix": "./data/PrescriptionDrugs/PrescriptionDrugs",
+                        "id": "drilldown-tab3",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Supplemental Health Ins.",
-                        "eventCategory": "Dental_Vision",
-                        "id": "drilldown-tab4"
+                        "ajax_request_only_data-val-file-prefix": "./data/Dental_Vision/Dental_Vision",
+                        "id": "drilldown-tab4",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Disability & Accident Ins.",
-                        "eventCategory": "DisabilityAccident",
-                        "id": "drilldown-tab5"
+                        "ajax_request_only_data-val-file-prefix": "./data/DisabilityAccident/DisabilityAccident",
+                        "id": "drilldown-tab5",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Coverage for Specific Health Services",
-                        "eventCategory": "Specific_Services",
-                        "id": "drilldown-tab6"
+                        "ajax_request_only_data-val-file-prefix": "./data/Specific_Services/Specific_Services",
+                        "id": "drilldown-tab6",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Wellness",
-                        "eventCategory": "Wellness",
-                        "id": "drilldown-tab7"
+                        "ajax_request_only_data-val-file-prefix": "./data/Wellness/Wellness",
+                        "id": "drilldown-tab7",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
                 SHRM.utils.retirement = [
                     {
                         "name": "Retirement",
-                        "eventCategory": "Retirement",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/Financial_Retirement/Financial_Retirement",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "401(k)",
-                        "eventCategory": "Defined Contribution Retirement Savings Plan",
-                        "id": "drilldown-tab2"
+                        "ajax_request_only_data-val-file-prefix": "./data/Financial_DCRSP/Financial_DCRSP",
+                        "id": "drilldown-tab2",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Education and Financial Wellness",
-                        "eventCategory": "Education and Financial",
-                        "id": "drilldown-tab3"
+                        "ajax_request_only_data-val-file-prefix": "./data/Financial_Education/Financial_Education",
+                        "id": "drilldown-tab3",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Other Retirement",
-                        "eventCategory": "Other Retirement",
-                        "id": "drilldown-tab4"
+                        "ajax_request_only_data-val-file-prefix": "./data/Financial_Other/Financial_Other",
+                        "id": "drilldown-tab4",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
                 SHRM.utils.leave = [
                     {
                         "name": "Vacation & Sick",
-                        "eventCategory": "Vacation Sick Personal Leave",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/Leave_Vacay_Sick/Leave_Vacay_Sick",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Parental",
-                        "eventCategory": "Leave for New Parents",
-                        "id": "drilldown-tab2"
+                        "ajax_request_only_data-val-file-prefix": "./data/Leave_Parental/Leave_Parental",
+                        "id": "drilldown-tab2",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Family",
-                        "eventCategory": "Family and Elder Care Leave",
-                        "id": "drilldown-tab3"
+                        "ajax_request_only_data-val-file-prefix": "./data/Leave_Family/Leave_Family",
+                        "id": "drilldown-tab3",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     },
                     {
                         "name": "Other",
-                        "eventCategory": "Other Leave",
-                        "id": "drilldown-tab4"
+                        "ajax_request_only_data-val-file-prefix": "./data/Leave_Other/Leave_Other",
+                        "id": "drilldown-tab4",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
                 SHRM.utils.flexibility = [
                     {
                         "name": "Flex Work",
-                        "eventCategory": "Flexible Work",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/Flexible_Work/Flexible_Work",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
                 SHRM.utils.family = [
                     {
                         "name": "Family Friendly",
-                        "eventCategory": "Family-Friendly",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/Family_Friendly/Family_Friendly",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
                 SHRM.utils.profdev = [
                     {
                         "name": "Professional Development",
-                        "eventCategory": "Professional Career Development",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/Prof_Development/Prof_Development",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
                 SHRM.utils.wellness = [
                     {
                         "name": "Wellness",
-                        "eventCategory": "Wellness",
-                        "id": "drilldown-tab1"
+                        "ajax_request_only_data-val-file-prefix": "./data/Wellness/Wellness",
+                        "id": "drilldown-tab1",
+                        "data-val-filterby": "by-1",
+                        "ajax_request_only_data-val-config-keys": "['region','industry','orgsize']",
+                        "ajax_request_only_data-val-config-path": "./data/config.csv"
                     }
                 ]
 
@@ -1101,25 +1121,24 @@
                 SHRM.utils.data.tableheader = [
                     {"c1":"Type of Plan","c2":"2016","c3":"2017","c4":"2018","c5":"2019","c6":"2020","c7":"1 year change","c8":"","c9":""}
                 ]
-                SHRM.utils.data.tabledata_orig = [
-                    {"eventCategory":"HealthSavings","eventLabel":"all","plan_type":"2__ Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"-2","sparkline_data":"84,85,84,86,79"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"-2","sparkline_data":"84,85,84,86,79"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"Health maintenance organization (HMO)", "y1":"32%","y2":"34%","y3":"35%","y4":"34%","y5":"34%","delta":"0%","indicator":"0","sparkline_data":"32,34,35,34,34"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"High-deductible health plan (HDHP) that is linked with a savings/spending account", "y1":"--","y2":"--","y3":"--","y4":"61%","y5":"59%","delta":"-2%","indicator":"-1","sparkline_data":"61,59"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"High-deductible health plan (HDHP) that is NOT linked with a savings/spending account", "y1":"17%","y2":"19%","y3":"29%","y4":"19%","y5":"16%","delta":"-3%","indicator":"-2","sparkline_data":"17,19,29,19,16"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"Point of service (POS)", "y1":"21%","y2":"21%","y3":"17%","y4":"19%","y5":"13%","delta":"-6%","indicator":"-2","sparkline_data":"21,21,17,19,13"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"Exclusive provider organization (EPO)", "y1":"9%","y2":"9%","y3":"7%","y4":"9%","y5":"9%","delta":"0%","indicator":"0","sparkline_data":"9,9,7,9,9"},
-                    {"eventCategory":"GenHealth","eventLabel":"all","plan_type":"Indemnity plan (fee-for-service)", "y1":"7%","y2":"8%","y3":"4%","y4":"6%","y5":"4%","delta":"-2%","indicator":"-2","sparkline_data":"7,8,4,6,4"},
-                    {"eventCategory":"GenHealth","eventLabel":"NE","plan_type":"Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"2","sparkline_data":"84,85,84,86,79"},
-                    {"eventCategory":"GenHealth","eventLabel":"NE","plan_type":"Health maintenance organization (HMO)", "y1":"32%","y2":"34%","y3":"35%","y4":"34%","y5":"34%","delta":"0%","indicator":"0","sparkline_data":"32,34,35,34,34"},
-                    {"eventCategory":"GenHealth","eventLabel":"S","plan_type":"High-deductible health plan (HDHP) that is linked with a savings/spending account", "y1":"--","y2":"--","y3":"--","y4":"61%","y5":"59%","delta":"-2%","indicator":"-1","sparkline_data":"61,59"},
-                    {"eventCategory":"GenHealth","eventLabel":"S","plan_type":"High-deductible health plan (HDHP) that is NOT linked with a savings/spending account", "y1":"17%","y2":"19%","y3":"29%","y4":"19%","y5":"16%","delta":"-3%","indicator":"-2","sparkline_data":"17,19,29,19,16"},
-                    {"eventCategory":"GenHealth","eventLabel":"S","plan_type":"Point of service (POS)", "y1":"21%","y2":"21%","y3":"17%","y4":"19%","y5":"13%","delta":"-6%","indicator":"-2","sparkline_data":"21,21,17,19,13"},
-                    {"eventCategory":"GenHealth","eventLabel":"W","plan_type":"Exclusive provider organization (EPO)", "y1":"9%","y2":"9%","y3":"7%","y4":"9%","y5":"9%","delta":"0%","indicator":"0","sparkline_data":"9,9,7,9,9"},
-                    {"eventCategory":"GenHealth","eventLabel":"2","plan_type":"Indemnity plan (fee-for-service)", "y1":"7%","y2":"8%","y3":"4%","y4":"6%","y5":"4%","delta":"-2%","indicator":"-2","sparkline_data":"7,8,4,6,4"}
+                SHRM.utils.data.tabledata = [
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"-2","sparkline_data":"84,85,84,86,79"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Health maintenance organization (HMO)", "y1":"32%","y2":"34%","y3":"35%","y4":"34%","y5":"34%","delta":"0%","indicator":"0","sparkline_data":"32,34,35,34,34"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"High-deductible health plan (HDHP) that is linked with a savings/spending account", "y1":"--","y2":"--","y3":"--","y4":"61%","y5":"59%","delta":"-2%","indicator":"-1","sparkline_data":"61,59"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"High-deductible health plan (HDHP) that is NOT linked with a savings/spending account", "y1":"17%","y2":"19%","y3":"29%","y4":"19%","y5":"16%","delta":"-3%","indicator":"-2","sparkline_data":"17,19,29,19,16"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Point of service (POS)", "y1":"21%","y2":"21%","y3":"17%","y4":"19%","y5":"13%","delta":"-6%","indicator":"-2","sparkline_data":"21,21,17,19,13"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Exclusive provider organization (EPO)", "y1":"9%","y2":"9%","y3":"7%","y4":"9%","y5":"9%","delta":"0%","indicator":"0","sparkline_data":"9,9,7,9,9"},
+                    {"eventCategory":"General Health","eventLabel":"all","plan_type":"Indemnity plan (fee-for-service)", "y1":"7%","y2":"8%","y3":"4%","y4":"6%","y5":"4%","delta":"-2%","indicator":"-2","sparkline_data":"7,8,4,6,4"},
+                    {"eventCategory":"General Health","eventLabel":"NE","plan_type":"Preferred provider organization (PPO)", "y1":"84%","y2":"85%","y3":"84%","y4":"86%","y5":"79%","delta":"-7%","indicator":"2","sparkline_data":"84,85,84,86,79"},
+                    {"eventCategory":"General Health","eventLabel":"NE","plan_type":"Health maintenance organization (HMO)", "y1":"32%","y2":"34%","y3":"35%","y4":"34%","y5":"34%","delta":"0%","indicator":"0","sparkline_data":"32,34,35,34,34"},
+                    {"eventCategory":"General Health","eventLabel":"S","plan_type":"High-deductible health plan (HDHP) that is linked with a savings/spending account", "y1":"--","y2":"--","y3":"--","y4":"61%","y5":"59%","delta":"-2%","indicator":"-1","sparkline_data":"61,59"},
+                    {"eventCategory":"General Health","eventLabel":"S","plan_type":"High-deductible health plan (HDHP) that is NOT linked with a savings/spending account", "y1":"17%","y2":"19%","y3":"29%","y4":"19%","y5":"16%","delta":"-3%","indicator":"-2","sparkline_data":"17,19,29,19,16"},
+                    {"eventCategory":"General Health","eventLabel":"S","plan_type":"Point of service (POS)", "y1":"21%","y2":"21%","y3":"17%","y4":"19%","y5":"13%","delta":"-6%","indicator":"-2","sparkline_data":"21,21,17,19,13"},
+                    {"eventCategory":"General Health","eventLabel":"West","plan_type":"Exclusive provider organization (EPO)", "y1":"9%","y2":"9%","y3":"7%","y4":"9%","y5":"9%","delta":"0%","indicator":"0","sparkline_data":"9,9,7,9,9"},
+                    {"eventCategory":"General Health","eventLabel":"West","plan_type":"Indemnity plan (fee-for-service)", "y1":"7%","y2":"8%","y3":"4%","y4":"6%","y5":"4%","delta":"-2%","indicator":"-2","sparkline_data":"7,8,4,6,4"}
                 ]
 
-                initDefaults('by-1', ['industry','orgsize','region','states'])   // ('by-1', ['region','industry','orgsize'], 'benefitsPortal', 'healthcare', null, 'drilldown-tab1')
+                initDefaults('by-1', ['region','industry','orgsize'])   // ('by-1', ['region','industry','orgsize'], 'benefitsPortal', 'healthcare', null, 'drilldown-tab1')
                 
                 console.timeEnd('Page load');
             });
@@ -1141,7 +1160,7 @@
 
             .research_findings {
                 width: 100%;
-                max-width: 1000px;
+                omax-width: 100%;
                 margin-bottom: 20px;
                 padding-left: 25px;
                 padding-right: 25px;
@@ -1248,16 +1267,14 @@
 
             .bootstrap-select {margin-top: 5px;}
 
-            @media screen and (max-width: 1000px) {
+            @media screen and (max-width: 1275px) {
                 .nav_layer1{ display: contents; }
                 .nav_layer2{ display: none; }
             }
 
-            @media screen and (min-width: 1000px) {
-                .remove_nav_layer1{ display: none; }
-                .remove_nav_layer2{ display: block; }
-                .nav_layer1{ display: contents; }
-                .nav_layer2{ display: none; }
+            @media screen and (min-width: 1275px) {
+                .nav_layer1{ display: none; }
+                .nav_layer2{ display: block; }
             }
 
             iframe.responsive_iframe {
@@ -1296,99 +1313,20 @@
                     <!-- HTML for Bootstrap Tabs, assuming the screen size is wide enough -->
                     <ul class="nav nav-tabs" id="tabs" role="tablist" data-bind="foreach: SHRM.utils.tabs">
                         <li class="nav-item">
-                            <a class="nav-link" data-bind="text: name, attr: {id: id, href: '#' + id, categoryCode: eventCategory}" data-toggle="tab"role="tab" aria-controls="home" aria-selected="true"></a>
+                            <a class="nav-link" data-bind="text: name, attr: {id: id, href: '#' + id}" data-toggle="tab"role="tab" aria-controls="home" aria-selected="true"></a>
                         </li>
                     </ul>
                 </div>
                 <div class="nav_layer1">
                     <!-- HTML for BootStrap SelectList, assuming the screen size is too small for the tabs. -->
                     <select class="col-md-4 selectpicker navpicker" data-size="9" data-bind="foreach: SHRM.utils.tabs">
-                        <option data-bind="text: name, attr: {value: id, categoryCode: eventCategory}"></option>
+                        <option data-bind="text: name, attr: {value: id}"></option>
                     </select>
                 </div>
                 
                 <div class="nav_layer3">
                     <select class="col-md-4 selectpicker-1" data-size="9" tabindex="-98">
                         <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
-                        <optgroup label="Industries">
-                            <option value="CONSTR">Construction</option>
-                            <option value="FINANCE">Financial Activities</option>
-                            <option value="GOVTEDU">Government &amp; Education</option>
-                            <option value="HLTHSS">Healthcare and Social Assistance</option>
-                            <option value="LSHOSP">Leisure &amp; Hospitality</option>
-                            <option value="MANFCT">Manufacturing</option>
-                            <option value="OTHER">Other</option>
-                            <option value="OTHSERV">Other Services</option>
-                            <option value="PROFBUS">Professional &amp; Business Services</option>
-                            <option value="R_W_T_U">Retail, Wholesale, Transport, Utilities</option>
-                        </optgroup>
-                        <optgroup label="Orgsizes">
-                            <option value="SM">1-99</option>
-                            <option value="MD">100-499</option>
-                            <option value="LG">500-4999</option>
-                            <option value="XL">5000+</option>
-                        </optgroup>
-                        <optgroup label="Regions">
-                            <option value="M">Midwest</option>
-                            <option value="NE">Northeast</option>
-                            <option value="S">South</option>
-                            <option value="W">West</option>
-                        </optgroup>
-                        <optgroup label="States">
-                            <option value="S.01">Alabama</option>
-                            <option value="S.02">Alaska</option>
-                            <option value="S.03">Arizona</option>
-                            <option value="S.04">Arkansas</option>
-                            <option value="S.05">California</option>
-                            <option value="S.06">Colorado</option>
-                            <option value="S.07">Connecticut</option>
-                            <option value="S.08">Delaware</option>
-                            <option value="S.09">District of Columbia</option>
-                            <option value="S.10">Florida</option>
-                            <option value="S.11">Georgia</option>
-                            <option value="S.12">Hawaii</option>
-                            <option value="S.13">Idaho</option>
-                            <option value="S.14">Illinois</option>
-                            <option value="S.15">Indiana</option>
-                            <option value="S.16">Iowa</option>
-                            <option value="S.17">Kansas</option>
-                            <option value="S.18">Kentucky</option>
-                            <option value="S.19">Louisiana</option>
-                            <option value="S.20">Maine</option>
-                            <option value="S.21">Maryland</option>
-                            <option value="S.22">Massachusetts</option>
-                            <option value="S.23">Michigan</option>
-                            <option value="S.24">Minnesota</option>
-                            <option value="S.25">Mississippi</option>
-                            <option value="S.26">Missouri</option>
-                            <option value="S.27">Montana</option>
-                            <option value="S.28">Nebraska</option>
-                            <option value="S.29">Nevada</option>
-                            <option value="S.30">New Hampshire</option>
-                            <option value="S.31">New Jersey</option>
-                            <option value="S.32">New Mexico</option>
-                            <option value="S.33">New York</option>
-                            <option value="S.34">North Carolina</option>
-                            <option value="S.35">North Dakota</option>
-                            <option value="S.36">Ohio</option>
-                            <option value="S.37">Oklahoma</option>
-                            <option value="S.38">Oregon</option>
-                            <option value="S.39">Pennsylvania</option>
-                            <option value="S.40">Puerto Rico</option>
-                            <option value="S.41">Rhode Island</option>
-                            <option value="S.42">South Carolina</option>
-                            <option value="S.43">South Dakota</option>
-                            <option value="S.44">Tennessee</option>
-                            <option value="S.45">Texas</option>
-                            <option value="S.46">Utah</option>
-                            <option value="S.47">Vermont</option>
-                            <option value="S.48">Virginia</option>
-                            <option value="S.49">Washington</option>
-                            <option value="S.50">West Virginia</option>
-                            <option value="S.51">Wisconsin</option>
-                            <option value="S.52">Wyoming</option>
-                            <!--<option value="S.53">Our organization is outside the U.S. or does not offer employee benefits</option>-->
-                        </optgroup>
                     </select>
                     <!-- The following block of HTML should be kept, so we can enable it later if needed -->
                     <!-- This is used if we want to have a drop down for region, for industry and for org size  -->
@@ -1431,27 +1369,19 @@
                         <thead data-bind="foreach: SHRM.utils.data.tableheader">
                             <tr>
                                 <th style="padding:5px;font-size: 14px;width:100%" data-bind="text: c1"></th>
-                                <th data-bind="text: c2" class="toggle"></th>
-                                <th data-bind="text: c3" class="toggle"></th>
-                                <th data-bind="text: c4" class="toggle"></th>
-                                <th data-bind="text: c5" class="toggle"></th>
-                                <th data-bind="text: c6"></th>
-                                <th data-bind="text: c7" colspan="2" class="toggle"></th>
-                                <th data-bind="text: c8" class="toggle"></th>
-                                </th>
-                            </tr>
+                                <th data-bind="text: c2"></th><th data-bind="text: c3"></th><th data-bind="text: c4"></th><th data-bind="text: c5"></th><th data-bind="text: c6"></th><th data-bind="text: c7" colspan="2"></th><th data-bind="text: c8"></th></th></tr>
                         </thead>
                         <tbody data-bind="foreach: filtered_results">
                             <tr>
                                 <td style="text-align: left;"><span data-bind="text: plan_type" style="color: grey; font-weight: bold"></span></td>
-                                <td class="toggle" style="text-align: right; width:60px" data-bind="text: y1"></td>
-                                <td class="toggle" style="text-align: right;" data-bind="text: y2"></td>
-                                <td class="toggle" style="text-align: right;" data-bind="text: y3"></td>
-                                <td class="toggle" style="text-align: right;" data-bind="text: y4"></td>
+                                <td style="text-align: right; width:60px" data-bind="text: y1"></td>
+                                <td style="text-align: right;" data-bind="text: y2"></td>
+                                <td style="text-align: right;" data-bind="text: y3"></td>
+                                <td style="text-align: right;" data-bind="text: y4"></td>
                                 <td style="text-align: right;" data-bind="text: y5"></td>
-                                <td class="toggle" style="text-align: center"><span data-bind="text: delta" style="padding-right:10px"></span></td>
-                                <td class="toggle" style="text-align: center"><span style="width:14px;vertical-align: top;text-align: center;" class="indicator" data-bind="attr: { myindicator: indicator }"></span></td>
-                                <td class="toggle" style="text-align: right;"><div class="inlinesparkline" data-bind="attr: {myvalues: sparkline_data}"></div></td>
+                                <td style="text-align: center"><span data-bind="text: delta" style="padding-right:10px"></span></td>
+                                <td style="text-align: center"><span style="width:14px;vertical-align: top;text-align: center;" class="indicator" data-bind="attr: { myindicator: indicator }"></span></td>
+                                <td style="text-align: right;"><div class="inlinesparkline" data-bind="attr: {myvalues: sparkline_data}"></div></td>
                             </tr>
                         </tbody>
                     </table>
