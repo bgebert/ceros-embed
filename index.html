@@ -585,10 +585,15 @@
                 } );
 
                 $('.btn-filter').on('click', function (event){
-                    //debugger
                     //var filterBy = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-filterby"]
                     var filterBy = SHRM.utils.tabs.find(tab => tab.id === SHRM.utils.pageConfig.categoryType.replace('#',''))["data-val-filterby"]
                     var src = ''
+
+                    // BEGIN - This code block was put in to make life easier for Teresa.  I can be removed before we go live.
+                    var tab_name = SHRM.utils.tabs.find(tab => tab.id === SHRM.utils.pageConfig.categoryType.replace('#',''))["name"]
+                    $('.plan_type').text(tab_name)
+                    // END - This code block was put in to make life easier for Teresa.  I can be removed before we go live.
+
                     /*
                     var src = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-file-prefix"] + '-'
                     var configKeys = SHRM.utils.tabs.find(tab => tab.name === SHRM.utils.pageConfig.categoryText)["data-val-config-keys"]
@@ -872,7 +877,9 @@
                                 //Create Name for download file - safe for windows, mac, etc
                                 var $tab = $('.nav-tabs'), $active = $tab.find('.nav-link.active'), tab_text = $active.text();
                                 var select_text = $('.selectpicker-1 option:selected').text();
+                                //debugger
                                 downloadName = 'SHRM Benefits 2020 - ' + tab_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + select_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim()
+                                downloadName = 'SHRM Benefits 2020 - ' +  select_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + SHRM.utils.pageConfig.SubLevelType.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + tab_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim()
                                 downloadName = downloadName.replace('   ', ' ')
                                 downloadName = downloadName.replace('  ', ' ')
 
@@ -1430,7 +1437,7 @@
                     <table class="research_findings">
                         <thead data-bind="foreach: SHRM.utils.data.tableheader">
                             <tr>
-                                <th style="padding:5px;font-size: 14px;width:100%" data-bind="text: c1"></th>
+                                <th class="plan_type" style="padding:5px;font-size: 14px;width:100%" data-bind="text: c1"></th>
                                 <th data-bind="text: c2" class="toggle"></th>
                                 <th data-bind="text: c3" class="toggle"></th>
                                 <th data-bind="text: c4" class="toggle"></th>
@@ -1455,8 +1462,10 @@
                             </tr>
                         </tbody>
                     </table>
+                    <!--
                     <div class="hidden watermark_remove_me">Mock data.  Do not use.</div>
                     <br/><span class="drilldown_footer">Chart: &#169; 2020 Society for Human Resource Management &middot; Source: Employee Benefits 2020</span>
+                    -->
                 </div>
                 
             </div>
