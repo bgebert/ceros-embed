@@ -864,13 +864,13 @@
                 $('.export_as_image').on('click', function (event) {
                     showSpinner(true)
 
-                    SHRM.utils.loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js")
+                    SHRM.utils.loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.1.4/dist/html2canvas.min.js")
                         .then(() => {
                             // add class to resize div
                             $('.research_findings').addClass("research_findings_max_width")
                             
                             //$('.drilldown_image').append($('.research_findings').prop("outerHTML")).append($('.drilldown_footer')[0].outerHTML);
-                            html2canvas(document.querySelector('.research_findings_outer')).then(canvas => {
+                            html2canvas(document.querySelector('.research_findings_outer'), {scale: 2, background: '#ffffff', dpi: 300}).then(canvas => {
                                 console.log(canvas);
                                 //saveAs(canvas.toDataURL(), 'file-name.png');
 
@@ -879,7 +879,9 @@
                                 var select_text = $('.selectpicker-1 option:selected').text();
                                 //debugger
                                 downloadName = 'SHRM Benefits 2020 - ' + tab_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + select_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim()
+                                // BEGIN - This code block was put in to make life easier for Teresa.  I can be removed before we go live.
                                 downloadName = 'SHRM Benefits 2020 - ' +  select_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + SHRM.utils.pageConfig.SubLevelType.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim() + ' - ' + tab_text.replace(/[^a-zA-Z0-9-_\.]/g, ' ').trim()
+                                // END - This code block was put in to make life easier for Teresa.  I can be removed before we go live.
                                 downloadName = downloadName.replace('   ', ' ')
                                 downloadName = downloadName.replace('  ', ' ')
 
@@ -907,7 +909,7 @@
                 $('.export_as_pdf').on('click', function (event) {
                     showSpinner(true)
                     
-                    SHRM.utils.loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js")
+                    SHRM.utils.loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.1.4/dist/html2canvas.min.js")
                         .then(() => SHRM.utils.loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"))
                             .then(() => {
                                 // research_findings_outer
