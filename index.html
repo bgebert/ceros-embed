@@ -1311,13 +1311,13 @@
                 </div>
                 <div class="nav_layer1">
                     <!-- HTML for BootStrap SelectList, assuming the screen size is too small for the tabs. -->
-                    <select class="col-md-4 selectpicker navpicker" data-size="9" data-bind="foreach: SHRM.utils.tabs">
+                    <select class="col-md-4 selectpicker navpicker select-drilldown" data-size="9" data-bind="foreach: SHRM.utils.tabs">
                         <option data-bind="text: name, attr: {value: id, categoryCode: eventCategory}"></option>
                     </select>
                 </div>
                 
                 <div class="nav_layer3">
-                    <select class="col-md-4 selectpicker-1" data-size="9" tabindex="-98">
+                    <select class="col-md-4 selectpicker-1 select-filterby" data-size="9" tabindex="-98">
                         <option value="" data-val="all">All (Regions, Industries and Org Sizes)</option>
                         <optgroup label="Industries">
                             <option value="CONSTR">Construction</option>
