@@ -15,7 +15,8 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+        <!--<link href="https://fonts.googleapis.com/css2?family=Montserrat:400,700,bold&display=swap" rel="stylesheet">-->
+        <link href="https://fonts.googleapis.com/css?family=Proxima+Nova:400,bold,bolder&display=swap" rel="stylesheet">
 
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
@@ -1136,7 +1137,7 @@
 
         <style>
             body {
-                font-family: 'Montserrat', sans-serif;
+                font-family: 'proxima nova', sans-serif;
                 font-weight: 400;
             }
 
@@ -1155,7 +1156,7 @@
                 padding-left: 25px;
                 padding-right: 25px;
                 font-size: 14px;
-                font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                font-family: "proxima nova",sans-serif;
             }
 
             .research_findings>tbody>tr>td{
@@ -1188,7 +1189,7 @@
                 line-height: 1.42857143 !important;
                 vertical-align: top !important;
                 border-top: 1px solid #ddd !important;
-                font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+                font-family: "proxima nova",sans-serif !important;
                 font-size: 14px !important;
                 
             }
@@ -1224,7 +1225,7 @@
             }
 
             span.drilldown_footer {
-                font-family: Roboto, sans-serif;
+                font-family: "proxima nova", sans-serif;
                 font-weight: 400;
                 font-size: 11px;
                 text-decoration: none;
@@ -1439,7 +1440,7 @@
                 <div class="research_findings_outer" style="width:100%;padding:25px">
                     <table class="research_findings">
                         <thead data-bind="foreach: SHRM.utils.data.tableheader">
-                            <tr>
+                            <tr style="background-color: #0076be; color:white">
                                 <th class="plan_type" style="padding:5px;font-size: 14px;width:100%" data-bind="text: c1"></th>
                                 <th data-bind="text: c2" class="toggle"></th>
                                 <th data-bind="text: c3" class="toggle"></th>
@@ -1453,7 +1454,7 @@
                         </thead>
                         <tbody data-bind="foreach: filtered_results">
                             <tr>
-                                <td style="text-align: left;"><span data-bind="text: plan_type" style="color: grey; font-weight: bold"></span></td>
+                                <td style="text-align: left;"><span data-bind="text: plan_type" style="color: #000000; ofont-weight: bold"></span></td>
                                 <td class="toggle" style="text-align: right; width:60px" data-bind="text: y1"></td>
                                 <td class="toggle" style="text-align: right;" data-bind="text: y2"></td>
                                 <td class="toggle" style="text-align: right;" data-bind="text: y3"></td>
